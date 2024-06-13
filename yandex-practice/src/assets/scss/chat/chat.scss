@@ -1,0 +1,116 @@
+.chat {
+  display: flex;
+  &__sidebar {
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    border-right: solid 1px $c-border;
+  }
+  &__header {
+    padding: 20px;
+    text-align: right;
+  }
+  &__list {
+    flex: 1;
+    overflow: auto;
+    &-item {
+      display: flex;
+      gap: 15px;
+      background: $c-light-highlight;
+      border-top: solid 1px $c-border;
+      padding: 20px;
+      font-size: 12px;
+    }
+    &-avatar {
+      flex-shrink: 0;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &-preview {
+      flex: 1;
+      overflow: hidden;
+    }
+    &-name,
+    &-intro {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &-name {
+      font: bold 16px $font-roboto;
+      margin-bottom: 5px;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+    &-intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    &-cell {
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    &-count {
+      font: 500 13px/1 $font-roboto;
+      padding: 4px 7px;
+      background: $c-link;
+      color: white;
+      border-radius: 50%;
+    }
+  }
+  &__container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  &__topbar {
+    border-bottom: solid 1px $c-border;
+    padding: 20px;
+    font-weight: bold;
+  }
+  &__form {
+    border-top: solid 1px $c-border;
+    background: $c-light-highlight;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    gap: 15px;
+  }
+  &__feed {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    overflow: auto;
+    padding: 20px;
+  }
+  &__message {
+    display: inline-flex;
+    flex-direction: column;
+    background: $c-highlight;
+    font-size: 12px;
+    padding: 15px;
+    border-radius: $field-border-radius;
+    &._outgoing {
+      align-self: flex-end;
+      background: $c-light-blue;
+    }
+    & + & {
+      margin-top: 20px;
+    }
+  }
+  &__time {
+    font-size: 10px;
+    opacity: 0.5;
+    text-align: right;
+  }
+}

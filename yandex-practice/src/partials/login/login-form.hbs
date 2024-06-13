@@ -1,0 +1,9 @@
+<form class="login-form">
+    <div class="login-form__title">Вход</div>
+    {{> uikit/field label="Логин" name="login" id="login" type="text" alert="Неверный логин" }}
+    {{> uikit/field label="Пароль" name="password" id="password" type="password" }}
+    {{> uikit/button name="Войти" }}
+    <div class="login-form__footer">
+        <a href="./register.html">Зарегистрироваться</a>
+    </div>
+</form>
