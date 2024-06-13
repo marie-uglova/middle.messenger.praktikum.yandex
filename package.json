@@ -21,7 +21,6 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "vite-plugin-handlebars": "^2.0.0",
-    "vite-plugin-ssr": "^0.4.142"
+    "vite-plugin-handlebars": "^2.0.0"
   }
 }
