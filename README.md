@@ -21,7 +21,7 @@ https://www.figma.com/file/jF5fFFzgGOxQeB4CmKWTiE/Chat_external_link?node-id=0%3
 
 Ошибка 500 https://yandexmessenger.netlify.app/static/500
 
-* Верстка пока неадаптивная.
+Верстка пока неадаптивная.
 
 Команды:
 
