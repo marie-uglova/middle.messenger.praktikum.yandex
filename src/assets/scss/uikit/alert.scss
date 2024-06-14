@@ -1,0 +1,7 @@
+.alert {
+  font-size: 12px;
+  margin-top: 5px;
+  &._error {
+    color: red;
+  }
+}
