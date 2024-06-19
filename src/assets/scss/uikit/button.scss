@@ -1,0 +1,15 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: $field-height;
+  font: 500 16px $font-roboto;
+  border: none;
+  background: $c-link;
+  color: white;
+  border-radius: $field-border-radius;
+  &:hover {
+    opacity: 0.9;
+  }
+}

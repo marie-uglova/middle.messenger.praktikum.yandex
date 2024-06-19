@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Изменить профиль | Проектная работа</title>
+    </head>
+    <body>
+        <div class="wrapper">
+
+            {{> template/header}}
+
+            <main class="main">
+                <div class="window _middle profile">
+                    <form>
+
+                        {{> profile/profile-header}}
+
+                        <div class="profile__form">
+                            {{> uikit/field label="Изменить аватар" name="avatar" id="avatar" type="file" }}
+                            {{> uikit/field label="Имя" name="first_name" id="first_name" type="text" }}
+                            {{> uikit/field label="Фамилия" name="second_name" id="second_name" type="text" }}
+                            {{> uikit/field label="Имя в чате" name="display_name" id="display_name" type="text" }}
+                            {{> uikit/field label="Логин" name="login" id="login" type="text" }}
+                            {{> uikit/field label="Почта" name="email" id="email" type="email" }}
+                            {{> uikit/field label="Телефон" name="phone" id="phone" type="tel" }}
+                        </div>
+
+                        <div class="profile__footer _small">
+                            {{> uikit/button name="Сохранить" type="submit" }}
+                        </div>
+
+                    </form>
+                </div>
+            </main>
+
+            {{> template/footer}}
+
+        </div>
+
+        <script type="module" src="js/index.js"></script>
+    </body>
+</html>
