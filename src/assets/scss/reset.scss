@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: normal #{$font-size}/#{$line-height} $font-roboto;
+  color: $c-text;
+  background: $c-highlight;
+}
+
+a {
+  color: $c-link;
+  &:hover {
+    color: lighten($c-link, 10%);
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+ul li {
+  list-style: none;
+}
+
+[type="search"]::-webkit-search-decoration,
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-results-button,
+[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance:none;
+}
+
+input {
+  outline: none;
+}
+
+button {
+  box-shadow: none;
+  &:not(:disabled),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

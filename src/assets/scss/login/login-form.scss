@@ -1,0 +1,12 @@
+.login-form {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  &__title {
+    font: 500 24px $font-roboto;
+  }
+  &__footer {
+    text-align: center;
+  }
+}
