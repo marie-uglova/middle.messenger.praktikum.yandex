@@ -1,0 +1,22 @@
+@import '../../../assets/scss/app';
+
+.field {
+  &__label {
+    &:not(:empty) {
+      display: block;
+      margin-bottom: 5px;
+    }
+  }
+  &__input {
+    width: 100%;
+    height: $field-height;
+    border: solid 1px $c-border;
+    padding: 10px;
+    border-radius: $field-border-radius;
+    font-size: 16px;
+    &:focus,
+    &:active {
+      border-color: $c-link;
+    }
+  }
+}

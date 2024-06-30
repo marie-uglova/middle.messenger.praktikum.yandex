@@ -5,22 +5,33 @@
   "scripts": {
     "start": "vite build && vite dev",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && tsc",
     "preview": "vite preview",
-    "start-node": "node express.js",
-    "start-nodemon": "nodemon express.js"
+    "start-node": "node express.ts",
+    "start-nodemon": "nodemon express.ts"
   },
   "engines": {
     "node": ">=16.0.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.5",
+    "eslint": "^9.5.0",
     "nodemon": "^3.1.3",
     "sass": "^1.77.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
     "vite": "^5.2.0"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-handlebars": "^7.1.3",
+    "handlebars": "^4.7.8",
+    "handlebars-loader": "^1.7.3",
+    "url": "^0.11.3",
+    "uuid": "^10.0.0",
+    "vite-plugin-checker": "^0.6.4",
     "vite-plugin-handlebars": "^2.0.0"
   }
 }

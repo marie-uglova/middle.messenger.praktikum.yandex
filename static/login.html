@@ -12,6 +12,16 @@
 
             <main class="main">
                 <div class="window _small">
+                    <!--<template id="TestComponent">
+                        <div>
+                            <input type="text" ya-model="title" />
+                            <h1>Title: <span ya-model="title"></span></h1>
+                            <button ya-click="handleClick">Replace from JS</button>
+                        </div>
+                    </template>
+
+                    <TestComponent></TestComponent>
+                    <TestComponent></TestComponent>-->
                     {{> login/login-form}}
                 </div>
             </main>
@@ -20,6 +30,6 @@
 
         </div>
 
-        <script type="module" src="js/index.js"></script>
+        <script type="module" src="../src/index.ts"></script>
     </body>
 </html>
