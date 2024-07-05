@@ -1,5 +1,7 @@
 Проектная работа Угловой Марии, Спринт 2
 
+https://yandex-messenger2.netlify.app/
+
 Команды:
 
 npm run start - запуск и сборка проекта
