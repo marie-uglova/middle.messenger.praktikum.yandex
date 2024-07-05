@@ -1,21 +1,16 @@
 import Block from './block';
-import { Alert } from '../components/uikit/alert';
+import { validationResults, validate, validateForm, checkLogin, checkName, checkPassword, checkEmail, checkPhone } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
 import { Link } from '../components/uikit/link';
 import { RegisterForm } from '../components/login/register-form';
+import { RegisterWindow } from '../components/login/register-window';
 import { RegisterPage } from '../pages/register-page';
 
 class InputComponent extends Block {
     render() {
         return Input;
-    }
-}
-
-class AlertComponent extends Block {
-    render() {
-        return Alert;
     }
 }
 
@@ -42,6 +37,12 @@ class RegisterFormComponent extends Block {
     }
 }
 
+class RegisterWindowComponent extends Block {
+    render() {
+        return RegisterWindow;
+    }
+}
+
 class RegisterPageComponent extends Block {
     render() {
         return RegisterPage;
@@ -55,6 +56,11 @@ const fieldEmail = new FieldComponent({
         name: 'email',
         id: 'email',
         type: 'email',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkEmail, 'email');
+            }
+        }
     })
 })
 
@@ -65,6 +71,11 @@ const fieldLogin = new FieldComponent({
         name: 'login',
         id: 'login',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkLogin, 'login');
+            }
+        }
     })
 })
 
@@ -75,6 +86,11 @@ const fieldName = new FieldComponent({
         name: 'first_name',
         id: 'first_name',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkName, 'first_name');
+            }
+        }
     })
 })
 
@@ -85,6 +101,11 @@ const fieldSecondName = new FieldComponent({
         name: 'second_name',
         id: 'second_name',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkName, 'second_name');
+            }
+        }
     })
 })
 
@@ -95,6 +116,11 @@ const fieldPhone = new FieldComponent({
         name: 'phone',
         id: 'phone',
         type: 'tel',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPhone, 'phone');
+            }
+        }
     })
 })
 
@@ -104,23 +130,33 @@ const fieldPassword = new FieldComponent({
     input: new InputComponent({
         name: 'password',
         id: 'password',
-        type: 'password'
+        type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'password');
+            }
+        }
     }),
 })
 
 const fieldPasswordRepeat = new FieldComponent({
-    for: 'password',
+    for: 'passwordRepeat',
     label: 'Пароль еще раз',
     input: new InputComponent({
-        name: 'password',
-        id: 'password',
-        type: 'password'
+        name: 'passwordRepeat',
+        id: 'passwordRepeat',
+        type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'passwordRepeat');
+            }
+        }
     }),
 })
 
 const buttonRegister = new ButtonComponent({
     text: 'Зарегистрироваться',
-    page: 'chat'
+    type: 'submit',
 })
 
 const linkLogin = new LinkComponent({
@@ -128,13 +164,22 @@ const linkLogin = new LinkComponent({
     page: 'login'
 })
 
-const registerContent = new RegisterFormComponent({
+const registerForm = new RegisterFormComponent({
     formContent: [fieldEmail, fieldLogin, fieldName, fieldSecondName, fieldPhone, fieldPassword, fieldPasswordRepeat, buttonRegister],
+    events: {
+        submit: (evt: Event) => {
+            checkForm(evt);
+        }
+    }
+})
+
+const registerContent = new RegisterWindowComponent({
+    registerForm: registerForm,
     registerFooter: linkLogin
 })
 
 export class RegisterPageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             registerPageContent: new RegisterPageComponent({
@@ -145,5 +190,31 @@ export class RegisterPageContainer extends Block {
 
     override render() {
         return `{{{ registerPageContent }}}`
+    }
+}
+
+function checkForm(evt: Event) {
+    evt.preventDefault();
+
+    const registerValidationResults: Record<string, boolean | null> = {
+        'email': validationResults.email,
+        'login': validationResults.login,
+        'first_name': validationResults.first_name,
+        'second_name': validationResults.second_name,
+        'phone': validationResults.phone,
+        'password': validationResults.password,
+        'passwordRepeat': validationResults.passwordRepeat
+    }
+
+    if(validationResults.login &&
+        validationResults.password &&
+        validationResults.passwordRepeat &&
+        validationResults.email &&
+        validationResults.phone &&
+        validationResults.first_name &&
+        validationResults.second_name) {
+        alert('Успех!');
+    } else {
+        validateForm(evt, registerValidationResults);
     }
 }

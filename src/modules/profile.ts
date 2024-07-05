@@ -56,7 +56,7 @@ const profileRowPhone = new ProfileRowComponent({
 });
 
 export class ProfilePageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             profilePageContent: new ProfilePageComponent({

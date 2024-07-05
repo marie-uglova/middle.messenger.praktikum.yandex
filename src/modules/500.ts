@@ -8,7 +8,7 @@ class Error500PageComponent extends Block {
 }
 
 export class Error500PageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             errorPageContent: new Error500PageComponent({

@@ -1,20 +1,15 @@
 import Block from './block';
-import { Alert } from '../components/uikit/alert';
+import { validationResults, validate, validateForm, checkPassword } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
 import { ProfileHeader } from '../components/profile/profile-header';
+import { ProfileForm } from '../components/profile/profile-form';
 import { ChangePasswordPage } from '../pages/change-password-page';
 
 class InputComponent extends Block {
     render() {
         return Input;
-    }
-}
-
-class AlertComponent extends Block {
-    render() {
-        return Alert;
     }
 }
 
@@ -36,6 +31,12 @@ class ProfileHeaderComponent extends Block {
     }
 }
 
+class ProfileFormComponent extends Block {
+    render() {
+        return ProfileForm;
+    }
+}
+
 class ChangePasswordPageComponent extends Block {
     render() {
         return ChangePasswordPage;
@@ -47,32 +48,47 @@ const profileHeader = new ProfileHeaderComponent({
 });
 
 const fieldOldPassword = new FieldComponent({
-    for: 'oldPassword',
+    for: 'password_old',
     label: 'Старый пароль',
     input: new InputComponent({
-        name: 'oldPassword',
-        id: 'oldPassword',
+        name: 'password_old',
+        id: 'password_old',
         type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'password_old');
+            }
+        }
     })
 })
 
 const fieldNewPassword = new FieldComponent({
-    for: 'newPassword',
+    for: 'password',
     label: 'Новый пароль',
     input: new InputComponent({
-        name: 'newPassword',
-        id: 'newPassword',
+        name: 'password',
+        id: 'password',
         type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'password');
+            }
+        }
     })
 })
 
 const fieldNewPasswordRepeat = new FieldComponent({
-    for: 'newPasswordRepeat',
+    for: 'password_repeat',
     label: 'Повторите новый пароль',
     input: new InputComponent({
-        name: 'newPasswordRepeat',
-        id: 'newPasswordRepeat',
+        name: 'password_repeat',
+        id: 'password_repeat',
         type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'password_repeat');
+            }
+        }
     })
 })
 
@@ -81,19 +97,46 @@ const buttonSave = new ButtonComponent({
     type: 'submit'
 })
 
+const profileForm = new ProfileFormComponent({
+    profileHeader: profileHeader,
+    profileEditForm: [fieldOldPassword, fieldNewPassword, fieldNewPasswordRepeat],
+    profileEditButton: buttonSave,
+    events: {
+        submit: (evt: Event) => {
+            checkForm(evt);
+        }
+    }
+})
+
 export class ChangePasswordPageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             changePasswordPageContent: new ChangePasswordPageComponent({
-                profileHeader: profileHeader,
-                profileChangePasswordForm: [fieldOldPassword, fieldNewPassword, fieldNewPasswordRepeat],
-                profileChangePasswordButton: buttonSave
+                profileForm: profileForm,
             }),
         })
     }
 
     override render() {
         return `{{{ changePasswordPageContent }}}`
+    }
+}
+
+function checkForm(evt: Event) {
+    evt.preventDefault();
+
+    const passwordValidationResults: Record<string, boolean | null> = {
+        'password': validationResults.password,
+        'password_repeat': validationResults.password_repeat,
+        'password_old': validationResults.password_old
+    }
+
+    if(validationResults.password &&
+        validationResults.password_repeat &&
+        validationResults.password_old) {
+        alert('Успех!');
+    } else {
+        validateForm(evt, passwordValidationResults);
     }
 }

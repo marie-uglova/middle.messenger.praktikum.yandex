@@ -18,5 +18,8 @@
     &:active {
       border-color: $c-link;
     }
+    &._error {
+      border-color: red;
+    }
   }
 }

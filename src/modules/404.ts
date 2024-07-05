@@ -8,7 +8,7 @@ class Error404PageComponent extends Block {
 }
 
 export class Error404PageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             errorPageContent: new Error404PageComponent({

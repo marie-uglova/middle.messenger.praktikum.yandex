@@ -1,21 +1,15 @@
-<div class="wrapper">
-    {{> Header }}
-    <main class="main">
-        <div class="window _middle profile">
-            {{{ profileHeader }}}
-            {{{ profileData }}}
-            <div class="profile__footer">
-                <div class="profile__row">
-                    <a page="profile-edit" class="link">Изменить данные</a>
-                </div>
-                <div class="profile__row">
-                    <a page="profile-change-password" class="link">Изменить пароль</a>
-                </div>
-                <div class="profile__row">
-                    <a page="login" class="link red">Выйти</a>
-                </div>
-            </div>
+<div class="window _middle profile">
+    {{{ profileHeader }}}
+    {{{ profileData }}}
+    <div class="profile__footer">
+        <div class="profile__row">
+            <a page="profile-edit" class="link">Изменить данные</a>
         </div>
-    </main>
-    {{> Footer }}
+        <div class="profile__row">
+            <a page="profile-change-password" class="link">Изменить пароль</a>
+        </div>
+        <div class="profile__row">
+            <a page="login" class="link red">Выйти</a>
+        </div>
+    </div>
 </div>

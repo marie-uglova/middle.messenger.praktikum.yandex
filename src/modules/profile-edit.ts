@@ -1,20 +1,15 @@
 import Block from './block';
-import { Alert } from '../components/uikit/alert';
+import { validationResults, validate, validateForm, checkLogin, checkName, checkEmail, checkPhone } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
 import { ProfileHeader } from '../components/profile/profile-header';
+import { ProfileForm } from '../components/profile/profile-form';
 import { ProfileEditPage } from '../pages/profile-edit-page';
 
 class InputComponent extends Block {
     render() {
         return Input;
-    }
-}
-
-class AlertComponent extends Block {
-    render() {
-        return Alert;
     }
 }
 
@@ -33,6 +28,12 @@ class ButtonComponent extends Block {
 class ProfileHeaderComponent extends Block {
     render() {
         return ProfileHeader;
+    }
+}
+
+class ProfileFormComponent extends Block {
+    render() {
+        return ProfileForm;
     }
 }
 
@@ -63,6 +64,11 @@ const fieldName = new FieldComponent({
         name: 'first_name',
         id: 'first_name',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkName, 'first_name');
+            }
+        }
     })
 })
 
@@ -73,6 +79,11 @@ const fieldSecondName = new FieldComponent({
         name: 'second_name',
         id: 'second_name',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkName, 'second_name');
+            }
+        }
     })
 })
 
@@ -93,6 +104,11 @@ const fieldLogin = new FieldComponent({
         name: 'login',
         id: 'login',
         type: 'text',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkLogin, 'login');
+            }
+        }
     })
 })
 
@@ -103,6 +119,11 @@ const fieldEmail = new FieldComponent({
         name: 'email',
         id: 'email',
         type: 'email',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkEmail, 'email');
+            }
+        }
     })
 })
 
@@ -113,6 +134,11 @@ const fieldPhone = new FieldComponent({
         name: 'phone',
         id: 'phone',
         type: 'tel',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPhone, 'phone');
+            }
+        }
     })
 })
 
@@ -121,19 +147,50 @@ const buttonSave = new ButtonComponent({
     type: 'submit'
 })
 
+const profileForm = new ProfileFormComponent({
+    profileHeader: profileHeader,
+    profileEditForm: [fieldAvatar, fieldName, fieldSecondName, fieldChatName, fieldLogin, fieldEmail, fieldPhone],
+    profileEditButton: buttonSave,
+    events: {
+        submit: (evt: Event) => {
+            checkForm(evt);
+        }
+    }
+})
+
 export class ProfileEditPageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             profileEditPageContent: new ProfileEditPageComponent({
-                profileHeader: profileHeader,
-                profileEditForm: [fieldAvatar, fieldName, fieldSecondName, fieldChatName, fieldLogin, fieldEmail, fieldPhone],
-                profileEditButton: buttonSave
+                profileForm: profileForm,
             }),
         })
     }
 
     override render() {
         return `{{{ profileEditPageContent }}}`
+    }
+}
+
+function checkForm(evt: Event) {
+    evt.preventDefault();
+
+    const profileValidationResults: Record<string, boolean | null> = {
+        'email': validationResults.email,
+        'login': validationResults.login,
+        'first_name': validationResults.first_name,
+        'second_name': validationResults.second_name,
+        'phone': validationResults.phone
+    }
+
+    if(validationResults.login &&
+        validationResults.email &&
+        validationResults.phone &&
+        validationResults.first_name &&
+        validationResults.second_name) {
+        alert('Успех!');
+    } else {
+        validateForm(evt, profileValidationResults);
     }
 }

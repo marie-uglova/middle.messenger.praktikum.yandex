@@ -1,10 +1,10 @@
-//@ts-nocheck
 export default class EventBus {
+    listeners: { [key: string]: Function[] } = {};
     constructor() {
         this.listeners = {};
     }
 
-    on(event, callback) {
+    on(event: string, callback: () => {}) {
         if (!this.listeners[event]) {
             this.listeners[event] = [];
         }
@@ -12,7 +12,7 @@ export default class EventBus {
         this.listeners[event].push(callback);
     }
 
-    off(event, callback) {
+    off(event: string, callback: () => {}) {
         if (!this.listeners[event]) {
             throw new Error(`Нет события: ${event}`);
         }
@@ -22,7 +22,7 @@ export default class EventBus {
         );
     }
 
-    emit(event, ...args) {
+    emit(event: string, ...args: undefined[]) {
         if (!this.listeners[event]) {
             throw new Error(`Нет события: ${event}`);
         }

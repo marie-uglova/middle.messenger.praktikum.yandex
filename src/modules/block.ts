@@ -1,6 +1,5 @@
-//@ts-nocheck
-import EventBus from "./event-bus";
-import Handlebars from "handlebars";
+import EventBus from './event-bus';
+import * as Handlebars from 'handlebars';
 
 export default class Block {
     static EVENTS = {
@@ -12,6 +11,10 @@ export default class Block {
 
     _element = null;
     _id = Math.floor(100000 + Math.random() * 900000);
+    props: {[key: string]: any};
+    children: {[key: string]: any};
+    lists: {[key: string]: any};
+    private eventBus: () => EventBus;
 
     constructor(propsWithChildren = {}) {
         const eventBus = new EventBus();
@@ -26,13 +29,16 @@ export default class Block {
 
     _addEvents() {
         const {events = {}} = this.props;
-        Object.keys(events).forEach(eventName => {this._element.addEventListener(eventName, events[eventName])} );
+        Object.keys(events).forEach(eventName => {
+            (this._element as unknown as HTMLAreaElement).addEventListener(eventName, events[eventName])
+        } );
     }
 
-    _registerEvents(eventBus) {
+    _registerEvents(eventBus: EventBus) {
         eventBus.on(Block.EVENTS.INIT, this.init.bind(this));
         eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-        eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+        // Пока не используется
+        //eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
         eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
     }
 
@@ -41,17 +47,20 @@ export default class Block {
     }
 
     _componentDidMount() {
-        this.componentDidMount();
+        // Это пока не используется
+        //this.componentDidMount();
         Object.values(this.children).forEach(child => {child.dispatchComponentDidMount();});
     }
 
-    componentDidMount(oldProps) {}
+    // Это пока не используется
+    /*componentDidMount(oldProps) {}*/
 
     dispatchComponentDidMount() {
         this.eventBus().emit(Block.EVENTS.FLOW_CDM);
     }
 
-    _componentDidUpdate(oldProps, newProps) {
+    // Это пока не используется
+    /*_componentDidUpdate(oldProps: string | number | null, newProps: string | number | null) {
         const response = this.componentDidUpdate(oldProps, newProps);
         if (!response) {
             return;
@@ -61,12 +70,12 @@ export default class Block {
 
     componentDidUpdate(oldProps, newProps) {
         return true;
-    }
+    }*/
 
-    _getChildrenPropsAndProps(propsAndChildren) {
-        const children = {};
-        const props = {};
-        const lists = {};
+    _getChildrenPropsAndProps(propsAndChildren: ArrayLike<unknown> | { [s: string]: unknown; }) {
+        const children: Record<string, any> = {};
+        const props: Record<string, any> = {};
+        const lists: Record<string, any> = {};
 
         Object.entries(propsAndChildren).forEach(([key, value]) => {
             if (value instanceof Block) {
@@ -85,11 +94,13 @@ export default class Block {
         const {attr = {}} = this.props;
 
         Object.entries(attr).forEach(([key, value]) => {
-            this._element.setAttribute(key, value);
+            if (typeof value === "string") {
+                (this._element as unknown as HTMLAreaElement).setAttribute(key, value);
+            }
         });
     }
 
-    setProps = nextProps => {
+    setProps = (nextProps: any) => {
         if (!nextProps) {
             return;
         }
@@ -102,42 +113,44 @@ export default class Block {
     }
 
     _render() {
-        console.log("Render")
+        //console.log("Render")
         const propsAndStubs = { ...this.props };
         const _tmpId =  Math.floor(100000 + Math.random() * 900000);
         Object.entries(this.children).forEach(([key, child]) => {
             propsAndStubs[key] = `<div data-id="${child._id}"></div>`;
         });
 
-        Object.entries(this.lists).forEach(([key, child]) => {
+        Object.entries(this.lists).forEach(([key, __]) => {
             propsAndStubs[key] = `<div data-id="__l_${_tmpId}"></div>`;
         });
 
         const fragment = this._createDocumentElement('template');
         fragment.innerHTML = Handlebars.compile(this.render())(propsAndStubs);
 
-        //comment if you want to see
         Object.values(this.children).forEach(child => {
-            const stub = fragment.content.querySelector(`[data-id="${child._id}"]`)
+            const stub = (fragment as HTMLTemplateElement).content.querySelector(`[data-id="${child._id}"]`) as Element;
             stub.replaceWith(child.getContent());
         });
 
-        Object.entries(this.lists).forEach(([key, child]) => {
-            const listCont = this._createDocumentElement('template');
-            child.forEach(item => {
+        Object.entries(this.lists).forEach(([__, child]) => {
+            const template = document.createElement('template') as HTMLTemplateElement;
+            const listCont = template.content;
+
+            child.forEach((item: { getContent: () => string | Node; }) => {
                 if (item instanceof Block) {
-                    listCont.content.append(item.getContent());
+                    listCont.append(item.getContent()!);
                 } else {
-                    listCont.content.append(`${item}`);
+                    listCont.append(document.createTextNode(`${item}`));
                 }
             });
-            const stub = fragment.content.querySelector(`[data-id="__l_${_tmpId}"]`);
-            stub.replaceWith(listCont.content);
-        });
 
-        const newElement = fragment.content.firstElementChild;
+            const stub = (fragment as HTMLTemplateElement).content.querySelector(`[data-id="__l_${_tmpId}"]`) as Element;
+            stub.replaceWith(template.content);
+        })
+
+        const newElement: any = (fragment as HTMLTemplateElement).content.firstElementChild as Element;
         if (this._element) {
-            this._element.replaceWith(newElement);
+            (this._element as HTMLAreaElement).replaceWith(newElement);
         }
         this._element = newElement;
         this._addEvents();
@@ -150,15 +163,15 @@ export default class Block {
         return this.element;
     }
 
-    _makePropsProxy(props) {
+    _makePropsProxy(props: {}) {
         const self = this;
 
         return new Proxy(props, {
-            get(target, prop) {
+            get(target: any, prop: string) {
                 const value = target[prop];
                 return typeof value === "function" ? value.bind(target) : value;
             },
-            set(target, prop, value) {
+            set(target: any, prop: string, value: string) {
                 const oldTarget = {...target};
                 target[prop] = value;
                 self.eventBus().emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
@@ -170,15 +183,16 @@ export default class Block {
         });
     }
 
-    _createDocumentElement(tagName) {
+    _createDocumentElement(tagName: string) {
         return document.createElement(tagName);
     }
 
-    show() {
-        this.getContent().style.display = "block";
+    // Пока не используется
+    /*show() {
+        this.getContent()!.style.display = "block";
     }
 
     hide() {
-        this.getContent().style.display = "none";
-    }
+        this.getContent()!.style.display = "none";
+    }*/
 }

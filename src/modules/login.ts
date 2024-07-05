@@ -1,21 +1,16 @@
 import Block from './block';
-import { Alert } from '../components/uikit/alert';
+import { validationResults, validate, validateForm, checkLogin, checkPassword } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
 import { Link } from '../components/uikit/link';
 import { LoginForm } from '../components/login/login-form';
+import { LoginWindow } from '../components/login/login-window';
 import { LoginPage } from '../pages/login-page';
 
 class InputComponent extends Block {
     render() {
         return Input;
-    }
-}
-
-class AlertComponent extends Block {
-    render() {
-        return Alert;
     }
 }
 
@@ -43,6 +38,12 @@ class LoginFormComponent extends Block {
     }
 }
 
+class LoginWindowComponent extends Block {
+    render() {
+        return LoginWindow;
+    }
+}
+
 class LoginPageComponent extends Block {
     render() {
         return LoginPage;
@@ -56,10 +57,11 @@ const fieldLogin = new FieldComponent({
         name: 'login',
         id: 'login',
         type: 'text',
-    }),
-    alert: new AlertComponent({
-        alert: 'Неверный логин',
-        classNameAlert: '_error',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkLogin, 'login');
+            }
+        }
     })
 })
 
@@ -69,13 +71,18 @@ const fieldPassword = new FieldComponent({
     input: new InputComponent({
         name: 'password',
         id: 'password',
-        type: 'password'
+        type: 'password',
+        events: {
+            blur: (evt: Event) => {
+                validate(evt, checkPassword, 'password');
+            }
+        }
     }),
 })
 
 const buttonEnter = new ButtonComponent({
     text: 'Войти',
-    page: 'chat'
+    type: 'submit',
 })
 
 const linkRegister = new LinkComponent({
@@ -83,13 +90,22 @@ const linkRegister = new LinkComponent({
     page: 'register'
 })
 
-const loginContent = new LoginFormComponent({
+const loginForm = new LoginFormComponent({
     formContent: [fieldLogin, fieldPassword, buttonEnter],
+    events: {
+        submit: (evt: Event) => {
+            checkForm(evt);
+        }
+    }
+})
+
+const loginContent = new LoginWindowComponent({
+    loginForm: loginForm,
     loginFooter: linkRegister
 })
 
 export class LoginPageContainer extends Block {
-    constructor(props) {
+    constructor(props: {[key: string]: string}) {
         super({
             ...props,
             loginPageContent: new LoginPageComponent({
@@ -98,14 +114,23 @@ export class LoginPageContainer extends Block {
         })
     }
 
-    /*componentDidUpdate(oldProps, newProps) {
-        if (oldProps.buttonText !== newProps.buttonText) {
-            this.children.button.setProps({ text: newProps.buttonText });
-        }
-        return true;
-    }*/
-
     override render() {
         return `{{{ loginPageContent }}}`
+    }
+}
+
+function checkForm(evt: Event) {
+    evt.preventDefault();
+
+    const loginValidationResults: Record<string, boolean | null> = {
+        'login': validationResults.login,
+        'password': validationResults.password,
+    }
+
+    if(validationResults.login &&
+        validationResults.password) {
+        alert('Успех!');
+    } else {
+        validateForm(evt, loginValidationResults);
     }
 }
