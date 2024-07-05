@@ -18,8 +18,10 @@ export function validate(evt: Event, checkFunctionName: { (value: string): boole
 
     if (checkFunctionName(value)) {
         input.classList.remove('_error');
+        (input.nextElementSibling as HTMLDivElement).textContent = '';
     } else {
         input.classList.add('_error');
+        (input.nextElementSibling as HTMLDivElement).textContent = 'Поле ' + input.name + ' заполнено неправильно';
     }
 }
 
@@ -31,6 +33,9 @@ export function validateForm(evt: Event, object: Record<string, boolean | null>)
     keysFailedResults.forEach((el) => {
         const input = (evt.target as HTMLInputElement).querySelector(`[name="${el}"]`);
         (input as HTMLInputElement).classList.add('_error');
+        if(input !== null) {
+            (input.nextElementSibling as HTMLDivElement).textContent = 'Поле ' + (input as HTMLInputElement).name + ' заполнено неправильно';
+        }
     })
 }
 

@@ -16,31 +16,26 @@ function queryStringify(data: string) {
     }, '?');
 }
 
+const timeout = 0;
+
+type HTTPMethod = (url: string, options?: {}) => Promise<unknown>
+
 class HTTPTransport {
-    get = (url: string, options = {
-        timeout: 0
-    }) => {
+    get: HTTPMethod = (url, options = {}) => (
+        this.request(url, {...options, method: METHODS.GET}, timeout)
+    )
 
-        return this.request(url, {...options, method: METHODS.GET}, options.timeout);
-    };
+    post: HTTPMethod = (url, options = {}) => (
+        this.request(url, {...options, method: METHODS.POST}, timeout)
+    )
 
-    post = (url: string, options = {
-        timeout: 0
-    }) => {
-        return this.request(url, {...options, method: METHODS.POST}, options.timeout);
-    };
+    put: HTTPMethod = (url, options = {}) => (
+        this.request(url, {...options, method: METHODS.PUT}, timeout)
+    )
 
-    put = (url: string, options = {
-        timeout: 0
-    }) => {
-        return this.request(url, {...options, method: METHODS.PUT}, options.timeout);
-    };
-
-    delete = (url: string, options = {
-        timeout: 0
-    }) => {
-        return this.request(url, {...options, method: METHODS.DELETE}, options.timeout);
-    };
+    delete: HTTPMethod = (url, options = {}) => (
+        this.request(url, {...options, method: METHODS.DELETE}, timeout)
+    )
 
     request = (url: string, options: { method: any; timeout?: number; headers?: any; data?: any; }, timeout = 5000) => {
         const {headers, method, data} = options;

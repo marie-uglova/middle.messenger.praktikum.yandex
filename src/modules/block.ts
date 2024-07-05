@@ -1,7 +1,7 @@
 import EventBus from './event-bus';
 import * as Handlebars from 'handlebars';
 
-export default class Block {
+export default class Block<Props extends Record<string, any> = any> {
     static EVENTS = {
         INIT: "init",
         FLOW_CDM: "flow:component-did-mount",
@@ -11,10 +11,12 @@ export default class Block {
 
     _element = null;
     _id = Math.floor(100000 + Math.random() * 900000);
-    props: {[key: string]: any};
-    children: {[key: string]: any};
-    lists: {[key: string]: any};
+    props: Props;
+    children: Record<string, any>;
+    lists: Record<string, any>;
     private eventBus: () => EventBus;
+    controller = new AbortController();
+    signal = this.controller;
 
     constructor(propsWithChildren = {}) {
         const eventBus = new EventBus();
@@ -31,7 +33,11 @@ export default class Block {
         const {events = {}} = this.props;
         Object.keys(events).forEach(eventName => {
             (this._element as unknown as HTMLAreaElement).addEventListener(eventName, events[eventName])
-        } );
+        }, this.signal );
+    }
+
+    _removeEvents() {
+        this.controller.abort();
     }
 
     _registerEvents(eventBus: EventBus) {
@@ -114,7 +120,7 @@ export default class Block {
 
     _render() {
         //console.log("Render")
-        const propsAndStubs = { ...this.props };
+        const propsAndStubs: Record<string, any> = { ...this.props };
         const _tmpId =  Math.floor(100000 + Math.random() * 900000);
         Object.entries(this.children).forEach(([key, child]) => {
             propsAndStubs[key] = `<div data-id="${child._id}"></div>`;

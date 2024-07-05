@@ -46,7 +46,7 @@ document.addEventListener('click', evt => {
     }
 });
 
-const block = new LoginPageContainer({});
+const block = new RegisterPageContainer({});
 const container = document.getElementById('app')!;
 container.append(block.getContent()!);
 
