@@ -1,4 +1,4 @@
-import EventBus from './event-bus';
+import EventBus from "./event-bus";
 import * as Handlebars from 'handlebars';
 
 export default class Block<Props extends Record<string, any> = any> {
@@ -43,8 +43,7 @@ export default class Block<Props extends Record<string, any> = any> {
     _registerEvents(eventBus: EventBus) {
         eventBus.on(Block.EVENTS.INIT, this.init.bind(this));
         eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-        // Пока не используется
-        //eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+        eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
         eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
     }
 
@@ -53,20 +52,17 @@ export default class Block<Props extends Record<string, any> = any> {
     }
 
     _componentDidMount() {
-        // Это пока не используется
-        //this.componentDidMount();
+        this.componentDidMount();
         Object.values(this.children).forEach(child => {child.dispatchComponentDidMount();});
     }
 
-    // Это пока не используется
-    /*componentDidMount(oldProps) {}*/
+    componentDidMount(oldProps) {}
 
     dispatchComponentDidMount() {
         this.eventBus().emit(Block.EVENTS.FLOW_CDM);
     }
 
-    // Это пока не используется
-    /*_componentDidUpdate(oldProps: string | number | null, newProps: string | number | null) {
+    _componentDidUpdate(oldProps: string | number | null, newProps: string | number | null) {
         const response = this.componentDidUpdate(oldProps, newProps);
         if (!response) {
             return;
@@ -76,7 +72,7 @@ export default class Block<Props extends Record<string, any> = any> {
 
     componentDidUpdate(oldProps, newProps) {
         return true;
-    }*/
+    }
 
     _getChildrenPropsAndProps(propsAndChildren: ArrayLike<unknown> | { [s: string]: unknown; }) {
         const children: Record<string, any> = {};
@@ -193,12 +189,11 @@ export default class Block<Props extends Record<string, any> = any> {
         return document.createElement(tagName);
     }
 
-    // Пока не используется
-    /*show() {
+    show() {
         this.getContent()!.style.display = "block";
     }
 
     hide() {
         this.getContent()!.style.display = "none";
-    }*/
+    }
 }

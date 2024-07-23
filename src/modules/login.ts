@@ -87,7 +87,7 @@ const buttonEnter = new ButtonComponent({
 
 const linkRegister = new LinkComponent({
     text: 'Зарегистрироваться',
-    page: 'register'
+    url: '/register',
 })
 
 const loginForm = new LoginFormComponent({
@@ -129,8 +129,12 @@ function checkForm(evt: Event) {
 
     if(validationResults.login &&
         validationResults.password) {
-        alert('Успех!');
+        login(fieldLogin, fieldPassword);
     } else {
         validateForm(evt, loginValidationResults);
     }
+}
+
+function login(login, password) {
+    console.log(login, password);
 }
