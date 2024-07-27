@@ -1,0 +1,32 @@
+import HTTPTransport from './http';
+
+export default class User {
+    http = new HTTPTransport();
+    user = {
+        first_name: null,
+        second_name: null,
+        login: null,
+        email: null,
+    }
+    constructor() {
+
+    }
+
+    getUser() {
+        this.http.get('https://ya-praktikum.tech/api/v2/auth/user', {
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+            },
+        })
+            .then((response) => {
+                return JSON.parse(response.response);
+            })
+            .then((data) => {
+                this.user.first_name = data.first_name;
+                this.user.second_name = data.second_name;
+                this.user.login = data.login;
+                this.user.email = data.email;
+                console.log(this.user);
+            })
+    }
+}

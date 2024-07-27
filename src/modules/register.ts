@@ -7,6 +7,13 @@ import { Link } from '../components/uikit/link';
 import { RegisterForm } from '../components/login/register-form';
 import { RegisterWindow } from '../components/login/register-window';
 import { RegisterPage } from '../pages/register-page';
+import Router from './router';
+import HTTPTransport from './http';
+import User from './get-user';
+
+const router = new Router('app'),
+    http = new HTTPTransport(),
+    user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -213,8 +220,38 @@ function checkForm(evt: Event) {
         validationResults.phone &&
         validationResults.first_name &&
         validationResults.second_name) {
-        alert('Успех!');
+        singUp();
     } else {
         validateForm(evt, registerValidationResults);
     }
+}
+
+function singUp() {
+    const first_name = document.querySelector(`[name="first_name"]`).value,
+        second_name = document.querySelector(`[name="second_name"]`).value,
+        login = document.querySelector(`[name="login"]`).value,
+        email = document.querySelector(`[name="email"]`).value,
+        password = document.querySelector(`[name="password"]`).value,
+        phone = document.querySelector(`[name="phone"]`).value;
+
+    const data = {
+        first_name: first_name,
+        second_name: second_name,
+        login: login,
+        email: email,
+        password: password,
+        phone: phone,
+    };
+
+    http.post('https://ya-praktikum.tech/api/v2/auth/signup', {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        data: JSON.stringify(data),
+    })
+        .then((response) => {
+            // сделать, чтобы редиректил только в случае успеха
+            router.go('/profile');
+            user.getUser();
+        });
 }

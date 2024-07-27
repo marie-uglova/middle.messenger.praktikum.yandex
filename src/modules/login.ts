@@ -129,12 +129,30 @@ function checkForm(evt: Event) {
 
     if(validationResults.login &&
         validationResults.password) {
-        login(fieldLogin, fieldPassword);
+        login();
     } else {
         validateForm(evt, loginValidationResults);
     }
 }
 
-function login(login, password) {
-    console.log(login, password);
+function login() {
+    const login = document.querySelector(`[name="login"]`).value,
+        password = document.querySelector(`[name="password"]`).value;
+    const data = {
+        login: login,
+        password: password,
+    };
+    console.log(data);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://ya-praktikum.tech/api/v2/auth/signin");
+    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+    xhr.onload = () => {
+        //console.log(JSON.parse(xhr.responseText));
+        /*if (xhr.readyState == 4 && xhr.status == 201) {
+            console.log(JSON.parse(xhr.responseText));
+        } else {
+            console.log(`Error: ${xhr.status}`);
+        }*/
+    };
+    xhr.send(JSON.stringify(data));
 }

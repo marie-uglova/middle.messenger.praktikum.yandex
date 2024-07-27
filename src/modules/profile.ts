@@ -2,6 +2,13 @@ import Block from './block';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileRow } from '../components/profile/profile-row';
 import { ProfilePage } from '../pages/profile-page';
+import { connect } from './hoc';
+import User from './get-user';
+
+const userInfo = new User();
+//const userInfo = connect(User);
+
+console.log(userInfo.user.first_name);
 
 class ProfileHeaderComponent extends Block {
     render() {
@@ -22,7 +29,7 @@ class ProfilePageComponent extends Block {
 }
 
 const profileHeader = new ProfileHeaderComponent({
-
+    userFirstName: userInfo.user.first_name,
 });
 
 const profileRowEmail = new ProfileRowComponent({

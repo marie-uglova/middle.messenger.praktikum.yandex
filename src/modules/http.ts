@@ -20,7 +20,7 @@ const timeout = 0;
 
 type HTTPMethod = (url: string, options?: {}) => Promise<unknown>
 
-class HTTPTransport {
+export default class HTTPTransport {
     get: HTTPMethod = (url, options = {}) => (
         this.request(url, {...options, method: METHODS.GET}, timeout)
     )
@@ -69,6 +69,8 @@ class HTTPTransport {
 
             xhr.timeout = timeout;
             xhr.ontimeout = reject;
+
+            xhr.withCredentials = true;
 
             if (isGet || !data) {
                 xhr.send();
