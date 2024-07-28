@@ -1,4 +1,5 @@
 import HTTPTransport from './http';
+import store from './store';
 
 export default class User {
     http = new HTTPTransport();
@@ -22,11 +23,25 @@ export default class User {
                 return JSON.parse(response.response);
             })
             .then((data) => {
-                this.user.first_name = data.first_name;
+                store.dispatch(() => {
+                    this.mapUserProps(data);
+                })
+                /*this.user.first_name = data.first_name;
                 this.user.second_name = data.second_name;
                 this.user.login = data.login;
                 this.user.email = data.email;
-                console.log(this.user);
+                console.log(this.user);*/
             })
     }
+
+    mapUserProps(state) {
+        return {
+            first_name: state.user.first_name,
+            second_name: state.user.second_name,
+            login: state.user.login,
+            email: state.user.email,
+        };
+    }
+
+
 }
