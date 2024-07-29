@@ -9,11 +9,9 @@ import { RegisterWindow } from '../components/login/register-window';
 import { RegisterPage } from '../pages/register-page';
 import Router from './router';
 import HTTPTransport from './http';
-import User from './get-user';
 
 const router = new Router('app'),
-    http = new HTTPTransport(),
-    user = new User();
+    http = new HTTPTransport();
 
 class InputComponent extends Block {
     render() {
@@ -252,6 +250,6 @@ function singUp() {
         .then((response) => {
             // сделать, чтобы редиректил только в случае успеха
             router.go('/profile');
-            user.getUser();
+            //user.getUser();
         });
 }

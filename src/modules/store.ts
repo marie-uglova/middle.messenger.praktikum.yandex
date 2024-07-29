@@ -19,9 +19,8 @@ const deepCopy = object => JSON.parse(JSON.stringify(object));
 
 const reducer = (state, action) => {
     let newState = deepCopy(state);
-    if(action.type === 'SET_TEXT') {
-        console.log('SET_TEXT')
-        newState.buttonText = action.buttonText;
+    if(action.type === 'ADD_USER') {
+        newState.user = action.payload;
         return newState;
     } else {
         return state;
@@ -29,14 +28,17 @@ const reducer = (state, action) => {
 };
 
 
-let state = {
-    buttonText: 'Initial text'
-};
+let state = {};
 
-let setTextAction = {
+/*let setTextAction = {
     type: 'SET_TEXT',
     buttonText: ''
 };
+
+let setUserProps = {
+    type: 'SET_USER',
+    buttonText: ''
+};*/
 
 let store = Object.freeze(createStore(reducer, state));
 

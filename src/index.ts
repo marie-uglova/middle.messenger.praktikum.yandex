@@ -10,10 +10,23 @@ import { ChangePasswordPageContainer } from './modules/change-password';
 import { Error404PageContainer } from './modules/404';
 import { Error500PageContainer } from './modules/500';
 
+function stateToPropsSelector(state: any) {
+    return {
+        first_name: state?.user?.first_name,
+        second_name: state?.user?.second_name,
+        login: state?.user?.login,
+        display_name: state?.user?.display_name,
+        email: state?.user?.email,
+        phone: state?.user?.phone,
+        avatar: state?.user?.avatar,
+        id: state?.user?.id,
+    }
+}
+
 const loginPage = connect(LoginPageContainer),
     registerPage = connect(RegisterPageContainer),
     chatPage = connect(ChatPageContainer),
-    profilePage = connect(ProfilePageContainer),
+    profilePage = connect(ProfilePageContainer, stateToPropsSelector),
     profileEditPage = connect(ProfileEditPageContainer),
     changePasswordPage = connect(ChangePasswordPageContainer),
     error404Page = connect(Error404PageContainer),

@@ -4,9 +4,7 @@ import { ProfileRow } from '../components/profile/profile-row';
 import { ProfilePage } from '../pages/profile-page';
 import { connect } from './hoc';
 import User from './get-user';
-
-//const userInfo = new User();
-const userInfo = connect(User);
+import store from "./store";
 
 class ProfileHeaderComponent extends Block {
     render() {
@@ -27,8 +25,7 @@ class ProfilePageComponent extends Block {
 }
 
 const profileHeader = new ProfileHeaderComponent({
-    //userFirstName: userInfo.user.first_name,
-    userFirstName: 'fdf',
+    userFirstName: ''
 });
 
 const profileRowEmail = new ProfileRowComponent({
@@ -38,7 +35,7 @@ const profileRowEmail = new ProfileRowComponent({
 
 const profileRowLogin = new ProfileRowComponent({
     label: 'Логин',
-    field: 'ivanivanov',
+    field: '',
 });
 
 const profileRowName = new ProfileRowComponent({
@@ -70,6 +67,16 @@ export class ProfilePageContainer extends Block {
                 profileData: [profileRowEmail, profileRowLogin, profileRowName, profileRowSecondName, profileRowChatName, profileRowPhone],
             }),
         })
+        new User().getUser();
+    }
+
+    override componentDidUpdate(oldProps: any, newProps: any): boolean {
+        if(oldProps.props?.first_name !== newProps.props?.first_name) {
+            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            profileRowLogin.setProps({field: newProps.props.login});
+            return true;
+        }
+        return false;
     }
 
     override render() {
