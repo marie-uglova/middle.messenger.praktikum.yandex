@@ -1,5 +1,6 @@
 import './assets/scss/app.scss';
 import Router from './modules/router';
+import User from './modules/get-user';
 import { connect } from './modules/hoc';
 import { LoginPageContainer } from './modules/login';
 import { RegisterPageContainer } from './modules/register';
@@ -9,6 +10,31 @@ import { ProfileEditPageContainer } from './modules/profile-edit';
 import { ChangePasswordPageContainer } from './modules/change-password';
 import { Error404PageContainer } from './modules/404';
 import { Error500PageContainer } from './modules/500';
+
+const loginPage = connect(LoginPageContainer, stateToPropsSelector),
+    registerPage = connect(RegisterPageContainer),
+    chatPage = connect(ChatPageContainer, stateToPropsSelector),
+    profilePage = connect(ProfilePageContainer, stateToPropsSelector),
+    profileEditPage = connect(ProfileEditPageContainer, stateToPropsSelector),
+    changePasswordPage = connect(ChangePasswordPageContainer, stateToPropsSelector),
+    error404Page = connect(Error404PageContainer),
+    error500Page = connect(Error500PageContainer);
+
+const router = new Router('app');
+const user = new User();
+
+user.getUserStore();
+
+router
+    .use("/", loginPage)
+    .use("/sign-up", registerPage)
+    .use("/messenger", chatPage)
+    .use("/profile", profilePage)
+    .use("/settings", profileEditPage)
+    .use("/change-password", changePasswordPage)
+    .use("/404", error404Page)
+    .use("/500", error500Page)
+    .start()
 
 function stateToPropsSelector(state: any) {
     return {
@@ -22,25 +48,3 @@ function stateToPropsSelector(state: any) {
         id: state?.user?.id,
     }
 }
-
-const loginPage = connect(LoginPageContainer),
-    registerPage = connect(RegisterPageContainer),
-    chatPage = connect(ChatPageContainer),
-    profilePage = connect(ProfilePageContainer, stateToPropsSelector),
-    profileEditPage = connect(ProfileEditPageContainer),
-    changePasswordPage = connect(ChangePasswordPageContainer),
-    error404Page = connect(Error404PageContainer),
-    error500Page = connect(Error500PageContainer);
-
-const router = new Router('app');
-
-router
-    .use("/", loginPage)
-    .use("/register", registerPage)
-    .use("/chat", chatPage)
-    .use("/profile", profilePage)
-    .use("/profile-edit", profileEditPage)
-    .use("/change-password", changePasswordPage)
-    .use("/404", error404Page)
-    .use("/500", error500Page)
-    .start()

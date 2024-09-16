@@ -190,7 +190,7 @@ export default class Block<Props extends Record<string, any> = any> {
     }
 
     show() {
-        this.getContent()!.style.display = "block";
+        this.getContent()!.style.display = "flex";
     }
 
     hide() {

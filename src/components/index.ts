@@ -15,5 +15,6 @@ export { ChatTopbar } from './chat/chat-topbar';
 export { ChatForm } from './chat/chat-form';
 
 export { ProfileHeader } from './profile/profile-header';
+export { ProfileAvatarForm } from './profile/profile-avatar-form';
 export { ProfileForm } from './profile/profile-form';
 export { ProfileRow } from './profile/profile-row';

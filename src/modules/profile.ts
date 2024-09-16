@@ -1,10 +1,21 @@
 import Block from './block';
+import { Link } from '../components/uikit/link';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileRow } from '../components/profile/profile-row';
 import { ProfilePage } from '../pages/profile-page';
-import { connect } from './hoc';
+import Router from './router';
+import HTTPTransport from './http';
 import User from './get-user';
-import store from "./store";
+
+const router = new Router('app'),
+    http = new HTTPTransport(),
+    user = new User();
+
+class LinkComponent extends Block {
+    render() {
+        return Link;
+    }
+}
 
 class ProfileHeaderComponent extends Block {
     render() {
@@ -25,12 +36,13 @@ class ProfilePageComponent extends Block {
 }
 
 const profileHeader = new ProfileHeaderComponent({
-    userFirstName: ''
+    userFirstName: '',
+    userAvatar: ''
 });
 
 const profileRowEmail = new ProfileRowComponent({
     label: 'Почта',
-    field: 'pochta@yandex.ru',
+    field: '',
 });
 
 const profileRowLogin = new ProfileRowComponent({
@@ -40,23 +52,33 @@ const profileRowLogin = new ProfileRowComponent({
 
 const profileRowName = new ProfileRowComponent({
     label: 'Имя',
-    field: 'Иван',
+    field: '',
 });
 
 const profileRowSecondName = new ProfileRowComponent({
     label: 'Фамилия',
-    field: 'Иванов',
+    field: '',
 });
 
 const profileRowChatName = new ProfileRowComponent({
     label: 'Имя в чате',
-    field: 'Иван',
+    field: '',
 });
 
 const profileRowPhone = new ProfileRowComponent({
     label: 'Телефон',
-    field: '+7 (909) 967 30 30',
+    field: '',
 });
+
+const linkOut = new LinkComponent({
+    text: 'Выйти',
+    className: 'red',
+    events: {
+        click: (evt: Event) => {
+            logOut(evt);
+        }
+    }
+})
 
 export class ProfilePageContainer extends Block {
     constructor(props: {[key: string]: string}) {
@@ -65,21 +87,41 @@ export class ProfilePageContainer extends Block {
             profilePageContent: new ProfilePageComponent({
                 profileHeader: profileHeader,
                 profileData: [profileRowEmail, profileRowLogin, profileRowName, profileRowSecondName, profileRowChatName, profileRowPhone],
+                profileOut: linkOut,
             }),
         })
-        new User().getUser();
+
+        user.getUserStore();
+
     }
 
     override componentDidUpdate(oldProps: any, newProps: any): boolean {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
-            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            profileHeader.setProps({userFirstName: newProps.props.first_name, userAvatar: newProps.props.avatar});
+            profileRowName.setProps({field: newProps.props.first_name});
+            profileRowSecondName.setProps({field: newProps.props.second_name});
             profileRowLogin.setProps({field: newProps.props.login});
+            profileRowChatName.setProps({field: newProps.props.display_name});
+            profileRowEmail.setProps({field: newProps.props.email});
+            profileRowPhone.setProps({field: newProps.props.phone});
             return true;
         }
         return false;
     }
 
     override render() {
-        return `{{{ profilePageContent }}}`
+        return `<main class="main">{{{ profilePageContent }}}</main>`
     }
+}
+
+function logOut(evt: Event) {
+    evt.preventDefault();
+    http.post('https://ya-praktikum.tech/api/v2/auth/logout', {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+    })
+        .then(() => {
+            router.go('/');
+        });
 }

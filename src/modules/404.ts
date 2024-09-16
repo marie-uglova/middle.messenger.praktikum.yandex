@@ -19,6 +19,6 @@ export class Error404PageContainer extends Block {
     }
 
     override render() {
-        return `{{{ errorPageContent }}}`
+        return `<main class="main">{{{ errorPageContent }}}</main>`
     }
 }

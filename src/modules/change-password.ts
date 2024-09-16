@@ -6,6 +6,11 @@ import { Button } from '../components/uikit/button';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
 import { ChangePasswordPage } from '../pages/change-password-page';
+import User from './get-user';
+import HTTPTransport from './http';
+
+const http = new HTTPTransport(),
+    user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -44,7 +49,7 @@ class ChangePasswordPageComponent extends Block {
 }
 
 const profileHeader = new ProfileHeaderComponent({
-
+    userFirstName: ''
 });
 
 const fieldOldPassword = new FieldComponent({
@@ -98,7 +103,6 @@ const buttonSave = new ButtonComponent({
 })
 
 const profileForm = new ProfileFormComponent({
-    profileHeader: profileHeader,
     profileEditForm: [fieldOldPassword, fieldNewPassword, fieldNewPasswordRepeat],
     profileEditButton: buttonSave,
     events: {
@@ -113,13 +117,24 @@ export class ChangePasswordPageContainer extends Block {
         super({
             ...props,
             changePasswordPageContent: new ChangePasswordPageComponent({
+                profileHeader: profileHeader,
                 profileForm: profileForm,
             }),
         })
+
+        user.getUserStore();
+    }
+
+    override componentDidUpdate(oldProps: any, newProps: any): boolean {
+        if(oldProps.props?.first_name !== newProps.props?.first_name) {
+            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            return true;
+        }
+        return false;
     }
 
     override render() {
-        return `{{{ changePasswordPageContent }}}`
+        return `<main class="main">{{{ changePasswordPageContent }}}</main>`
     }
 }
 
@@ -135,8 +150,35 @@ function checkForm(evt: Event) {
     if(validationResults.password &&
         validationResults.password_repeat &&
         validationResults.password_old) {
-        alert('Успех!');
+        changePassword(evt);
     } else {
         validateForm(evt, passwordValidationResults);
     }
+}
+
+function changePassword(evt: Event) {
+    const form = (evt.target as HTMLTextAreaElement),
+        oldPassword = form.querySelector(`[name="password_old"]`),
+        oldPasswordValue = (oldPassword as HTMLInputElement).value,
+        newPassword = form.querySelector(`[name="password"]`),
+        newPasswordValue = (newPassword as HTMLInputElement).value;
+
+    const data = {
+        oldPassword: oldPasswordValue,
+        newPassword: newPasswordValue,
+    };
+
+    http.put('https://ya-praktikum.tech/api/v2/user/password', {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        data: JSON.stringify(data),
+    })
+        .then((response) => {
+            if(response.status === 200) {
+                alert('Пароль изменен');
+            } else {
+                alert(JSON.parse(response.response).reason);
+            }
+        });
 }

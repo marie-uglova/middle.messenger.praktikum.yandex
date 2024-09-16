@@ -19,6 +19,6 @@ export class Error500PageContainer extends Block {
     }
 
     override render() {
-        return `{{{ errorPageContent }}}`
+        return `<main class="main">{{{ errorPageContent }}}</main>`
     }
 }

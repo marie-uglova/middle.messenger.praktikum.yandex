@@ -1,17 +1,15 @@
-<main class="main">
-    <div class="window _middle profile">
-        {{{ profileHeader }}}
-        {{{ profileData }}}
-        <div class="profile__footer">
-            <div class="profile__row">
-                <a page="profile-edit" class="link">Изменить данные</a>
-            </div>
-            <div class="profile__row">
-                <a page="profile-change-password" class="link">Изменить пароль</a>
-            </div>
-            <div class="profile__row">
-                <a page="login" class="link red">Выйти</a>
-            </div>
+<div class="window _middle profile">
+    {{{ profileHeader }}}
+    {{{ profileData }}}
+    <div class="profile__footer">
+        <div class="profile__row">
+            <a href="/settings" class="link">Изменить данные</a>
+        </div>
+        <div class="profile__row">
+            <a href="/change-password" class="link">Изменить пароль</a>
+        </div>
+        <div class="profile__row">
+            {{{ profileOut }}}
         </div>
     </div>
-</main>
+</div>

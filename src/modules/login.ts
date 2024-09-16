@@ -7,6 +7,11 @@ import { Link } from '../components/uikit/link';
 import { LoginForm } from '../components/login/login-form';
 import { LoginWindow } from '../components/login/login-window';
 import { LoginPage } from '../pages/login-page';
+import Router from './router';
+import HTTPTransport from './http';
+
+const router = new Router('app'),
+    http = new HTTPTransport();
 
 class InputComponent extends Block {
     render() {
@@ -87,7 +92,7 @@ const buttonEnter = new ButtonComponent({
 
 const linkRegister = new LinkComponent({
     text: 'Зарегистрироваться',
-    url: '/register',
+    url: '/sign-up',
 })
 
 const loginForm = new LoginFormComponent({
@@ -112,10 +117,11 @@ export class LoginPageContainer extends Block {
                 pageContent: loginContent
             }),
         })
+
     }
 
     override render() {
-        return `{{{ loginPageContent }}}`
+        return `<main class="main">{{{ loginPageContent }}}</main>`
     }
 }
 
@@ -129,30 +135,32 @@ function checkForm(evt: Event) {
 
     if(validationResults.login &&
         validationResults.password) {
-        login();
+        singIn(evt);
     } else {
         validateForm(evt, loginValidationResults);
     }
 }
 
-function login() {
-    const login = document.querySelector(`[name="login"]`).value,
-        password = document.querySelector(`[name="password"]`).value;
+function singIn(evt: Event) {
+    const form = (evt.target as HTMLTextAreaElement),
+        login = form.querySelector(`[name="login"]`),
+        loginValue = (login as HTMLInputElement).value,
+        password = form.querySelector(`[name="password"]`),
+        passwordValue = (password as HTMLInputElement).value;
+
     const data = {
-        login: login,
-        password: password,
+        login: loginValue,
+        password: passwordValue,
     };
-    console.log(data);
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://ya-praktikum.tech/api/v2/auth/signin");
-    xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-    xhr.onload = () => {
-        //console.log(JSON.parse(xhr.responseText));
-        /*if (xhr.readyState == 4 && xhr.status == 201) {
-            console.log(JSON.parse(xhr.responseText));
-        } else {
-            console.log(`Error: ${xhr.status}`);
-        }*/
-    };
-    xhr.send(JSON.stringify(data));
+
+    http.post('https://ya-praktikum.tech/api/v2/auth/signin', {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        data: JSON.stringify(data),
+    })
+        .then(() => {
+            // сделать, чтобы редиректил только в случае успеха
+            router.go('/messenger');
+        });
 }

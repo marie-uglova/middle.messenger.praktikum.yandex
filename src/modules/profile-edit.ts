@@ -5,7 +5,15 @@ import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
+import { ProfileAvatarForm } from '../components/profile/profile-avatar-form';
 import { ProfileEditPage } from '../pages/profile-edit-page';
+import Router from './router';
+import User from './get-user';
+import HTTPTransport from './http';
+
+const router = new Router('app'),
+    http = new HTTPTransport(),
+    user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -37,6 +45,12 @@ class ProfileFormComponent extends Block {
     }
 }
 
+class ProfileAvatarFormComponent extends Block {
+    render() {
+        return ProfileAvatarForm;
+    }
+}
+
 class ProfileEditPageComponent extends Block {
     render() {
         return ProfileEditPage;
@@ -44,7 +58,7 @@ class ProfileEditPageComponent extends Block {
 }
 
 const profileHeader = new ProfileHeaderComponent({
-
+    userFirstName: ''
 });
 
 const fieldAvatar = new FieldComponent({
@@ -54,92 +68,111 @@ const fieldAvatar = new FieldComponent({
         name: 'avatar',
         id: 'avatar',
         type: 'file',
+        accept: 'image/*'
     })
+})
+
+const inputName = new InputComponent({
+    name: 'first_name',
+    id: 'first_name',
+    type: 'text',
+    value: '',
+    events: {
+        blur: (evt: Event) => {
+            validate(evt, checkName, 'first_name');
+        }
+    }
 })
 
 const fieldName = new FieldComponent({
     for: 'first_name',
     label: 'Имя',
-    input: new InputComponent({
-        name: 'first_name',
-        id: 'first_name',
-        type: 'text',
-        events: {
-            blur: (evt: Event) => {
-                validate(evt, checkName, 'first_name');
-            }
+    input: inputName
+})
+
+const inputSecondName = new InputComponent({
+    name: 'second_name',
+    id: 'second_name',
+    type: 'text',
+    value: '',
+    events: {
+        blur: (evt: Event) => {
+            validate(evt, checkName, 'second_name');
         }
-    })
+    }
 })
 
 const fieldSecondName = new FieldComponent({
     for: 'second_name',
     label: 'Фамилия',
-    input: new InputComponent({
-        name: 'second_name',
-        id: 'second_name',
-        type: 'text',
-        events: {
-            blur: (evt: Event) => {
-                validate(evt, checkName, 'second_name');
-            }
-        }
-    })
+    input: inputSecondName
+})
+
+const inputDisplayName = new InputComponent({
+    name: 'display_name',
+    id: 'display_name',
+    type: 'text',
+    value: '',
 })
 
 const fieldChatName = new FieldComponent({
     for: 'display_name',
     label: 'Имя в чате',
-    input: new InputComponent({
-        name: 'display_name',
-        id: 'display_name',
-        type: 'text',
-    })
+    input: inputDisplayName
+})
+
+const inputLogin = new InputComponent({
+    name: 'login',
+    id: 'login',
+    type: 'text',
+    value: '',
+    events: {
+        blur: (evt: Event) => {
+            validate(evt, checkLogin, 'login');
+        }
+    }
 })
 
 const fieldLogin = new FieldComponent({
     for: 'login',
     label: 'Логин',
-    input: new InputComponent({
-        name: 'login',
-        id: 'login',
-        type: 'text',
-        events: {
-            blur: (evt: Event) => {
-                validate(evt, checkLogin, 'login');
-            }
+    input: inputLogin,
+})
+
+const inputEmail = new InputComponent({
+    name: 'email',
+    id: 'email',
+    type: 'email',
+    value: '',
+    events: {
+        blur: (evt: Event) => {
+            validate(evt, checkEmail, 'email');
         }
-    })
+    }
 })
 
 const fieldEmail = new FieldComponent({
     for: 'email',
     label: 'Почта',
-    input: new InputComponent({
-        name: 'email',
-        id: 'email',
-        type: 'email',
-        events: {
-            blur: (evt: Event) => {
-                validate(evt, checkEmail, 'email');
-            }
+    input: inputEmail
+})
+
+const inputPhone = new InputComponent({
+    name: 'phone',
+    id: 'phone',
+    type: 'tel',
+    value: '',
+    events: {
+        blur: (evt: Event) => {
+            validate(evt, checkPhone, 'phone');
         }
-    })
+    }
 })
 
 const fieldPhone = new FieldComponent({
     for: 'phone',
     label: 'Телефон',
-    input: new InputComponent({
-        name: 'phone',
-        id: 'phone',
-        type: 'tel',
-        events: {
-            blur: (evt: Event) => {
-                validate(evt, checkPhone, 'phone');
-            }
-        }
-    })
+    input: inputPhone
 })
 
 const buttonSave = new ButtonComponent({
@@ -147,9 +180,17 @@ const buttonSave = new ButtonComponent({
     type: 'submit'
 })
 
+const profileAvatarForm = new ProfileAvatarFormComponent({
+    profileAvatar: fieldAvatar,
+    events: {
+        submit: (evt: Event) => {
+            setAvatar(evt);
+        }
+    }
+})
+
 const profileForm = new ProfileFormComponent({
-    profileHeader: profileHeader,
-    profileEditForm: [fieldAvatar, fieldName, fieldSecondName, fieldChatName, fieldLogin, fieldEmail, fieldPhone],
+    profileEditForm: [fieldName, fieldSecondName, fieldChatName, fieldLogin, fieldEmail, fieldPhone],
     profileEditButton: buttonSave,
     events: {
         submit: (evt: Event) => {
@@ -163,13 +204,31 @@ export class ProfileEditPageContainer extends Block {
         super({
             ...props,
             profileEditPageContent: new ProfileEditPageComponent({
+                profileHeader: profileHeader,
+                profileAvatarForm: profileAvatarForm,
                 profileForm: profileForm,
             }),
         })
+
+        user.getUserStore();
+    }
+
+    override componentDidUpdate(oldProps: any, newProps: any): boolean {
+        if(oldProps.props?.first_name !== newProps.props?.first_name) {
+            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            inputName.setProps({value: newProps.props.first_name});
+            inputSecondName.setProps({value: newProps.props.second_name});
+            inputDisplayName.setProps({value: newProps.props.display_name});
+            inputLogin.setProps({value: newProps.props.login});
+            inputEmail.setProps({value: newProps.props.email});
+            inputPhone.setProps({value: newProps.props.phone});
+            return true;
+        }
+        return false;
     }
 
     override render() {
-        return `{{{ profileEditPageContent }}}`
+        return `<main class="main">{{{ profileEditPageContent }}}</main>`
     }
 }
 
@@ -189,8 +248,73 @@ function checkForm(evt: Event) {
         validationResults.phone &&
         validationResults.first_name &&
         validationResults.second_name) {
-        alert('Успех!');
+        changeProfile(evt);
     } else {
         validateForm(evt, profileValidationResults);
     }
+}
+
+function changeProfile(evt: Event) {
+    const form = (evt.target as HTMLTextAreaElement),
+        firstName = form.querySelector(`[name="first_name"]`),
+        firstNameValue = (firstName as HTMLInputElement).value,
+        secondName = form.querySelector(`[name="second_name"]`),
+        secondNameValue = (secondName as HTMLInputElement).value,
+        displayName = form.querySelector(`[name="display_name"]`),
+        displayNameValue = (displayName as HTMLInputElement).value,
+        login = form.querySelector(`[name="login"]`),
+        loginValue = (login as HTMLInputElement).value,
+        email = form.querySelector(`[name="email"]`),
+        emailValue = (email as HTMLInputElement).value,
+        phone = form.querySelector(`[name="phone"]`),
+        phoneValue = (phone as HTMLInputElement).value;
+
+    const data = {
+        first_name: firstNameValue,
+        second_name: secondNameValue,
+        display_name: displayNameValue,
+        login: loginValue,
+        email: emailValue,
+        phone: phoneValue,
+    };
+
+    http.put('https://ya-praktikum.tech/api/v2/user/profile', {
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        data: JSON.stringify(data),
+    })
+        .then((response) => {
+            if(response.status === 200) {
+                router.go('/profile');
+            } else {
+                alert(JSON.parse(response.response).reason);
+            }
+        });
+}
+
+function setAvatar(evt: Event) {
+    evt.preventDefault();
+
+    const form = (evt.target as HTMLTextAreaElement),
+        formData = new FormData(form),
+        avatar = form.querySelector(`[name="avatar"]`),
+        avatarValue = (avatar as HTMLInputElement).value;
+
+    formData.append('avatar', avatar);
+
+    http.put('https://ya-praktikum.tech/api/v2/user/profile/avatar', {
+        headers: {
+            'credentials': 'include',
+            'mode': 'cors',
+        },
+        data: formData,
+    })
+        .then((response) => {
+            if(response.status === 200) {
+                console.log(response);
+            } else {
+                alert(JSON.parse(response.response).reason);
+            }
+        });
 }

@@ -8,6 +8,12 @@ import {ChatMessage} from '../components/chat/chat-message';
 import {ChatTopbar} from '../components/chat/chat-topbar';
 import {ChatForm} from '../components/chat/chat-form/';
 import {ChatPage} from '../pages/chat-page';
+import User from './get-user';
+import HTTPTransport from './http';
+import {log} from "handlebars";
+
+const http = new HTTPTransport(),
+    user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -58,7 +64,11 @@ class ChatPageComponent extends Block {
 }
 
 const chatItem = new ChatItemComponent({
-
+    events: {
+        click: (evt: Event) => {
+            openChat(evt);
+        }
+    }
 });
 
 const chatTopbar = new ChatTopbarComponent({
@@ -139,10 +149,19 @@ export class ChatPageContainer extends Block {
                 chatForm: chatForm,
             }),
         })
+
     }
 
+    /*override componentDidUpdate(oldProps: any, newProps: any): boolean {
+        if(oldProps.props?.first_name !== newProps.props?.first_name) {
+            chatTopbar.setProps({name: newProps.props.id});
+            return true;
+        }
+        return false;
+    }*/
+
     override render() {
-        return `{{{ chatPageContent }}}`
+        return `<main class="main">{{{ chatPageContent }}}</main>`
     }
 }
 
@@ -160,14 +179,91 @@ function checkForm(evt: Event) {
     }
 }
 
-const testChatList: Record<string, string | null> = {
-    'message': ''
+function openChat(evt: Event) {
+
 }
+
+
 
 function sendMessage(evt: Event) {
     let input = (evt.target as HTMLInputElement).querySelector('input');
     if(input != null) {
-        testChatList.message = input.value;
-        console.log(testChatList);
+        const data = {
+            title: input.value,
+        };
+        // создаем чат
+        http.post('https://ya-praktikum.tech/api/v2/chats', {
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+            },
+            data: JSON.stringify(data),
+        })
+            .then((response) => {
+                if(response.status === 200) {
+                    const chatId = JSON.parse(response.response).id;
+                    //const userId = 2103;
+                    const userId = user.getUserId();
+                    const userIdAnother = 2102;
+                    const dataUsers = {
+                        users: [userIdAnother],
+                        chatId: chatId,
+                    };
+                    // получаем токен
+                    http.post(`https://ya-praktikum.tech/api/v2/chats/token/${chatId}`, {
+                        headers: {
+                            'Content-Type': 'application/json; charset=UTF-8',
+                            'credentials': 'include',
+                            'mode': 'cors',
+                        },
+                    })
+                        .then(data => {
+                            const token = JSON.parse(data.response).token;
+                            // подключаем к чату юзера
+                            http.put(`https://ya-praktikum.tech/api/v2/chats/users`, {
+                                headers: {
+                                    'Content-Type': 'application/json; charset=UTF-8',
+                                },
+                                data: JSON.stringify(dataUsers),
+                            })
+                                .then(response => {
+                                    if(response.status === 200) {
+                                        // запускаем WebSocket
+                                        const socket = new WebSocket(`wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`);
+                                        socket.addEventListener('open', () => {
+                                            console.log('Соединение установлено');
+
+                                            socket.send(JSON.stringify({
+                                                content: 'Моё первое сообщение миру!',
+                                                type: 'message',
+                                            }));
+                                        });
+
+                                        socket.addEventListener('close', event => {
+                                            if (event.wasClean) {
+                                                console.log('Соединение закрыто чисто');
+                                            } else {
+                                                console.log('Обрыв соединения');
+                                            }
+
+                                            console.log(`Код: ${event.code} | Причина: ${event.reason}`);
+                                        });
+
+                                        socket.addEventListener('message', event => {
+                                            console.log('Получены данные', event.data);
+                                        });
+
+                                        socket.addEventListener('error', event => {
+                                            console.log('Ошибка', event.message);
+                                        });
+                                    } else {
+                                        console.log('Не получилось подключить пользователя');
+                                    }
+                                })
+                        });
+
+                } else {
+                    alert(JSON.parse(response.response).reason);
+                }
+            });
     }
 }

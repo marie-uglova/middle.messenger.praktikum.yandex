@@ -166,7 +166,7 @@ const buttonRegister = new ButtonComponent({
 
 const linkLogin = new LinkComponent({
     text: 'Войти',
-    page: 'login'
+    url: '/',
 })
 
 const registerForm = new RegisterFormComponent({
@@ -194,7 +194,7 @@ export class RegisterPageContainer extends Block {
     }
 
     override render() {
-        return `{{{ registerPageContent }}}`
+        return `<main class="main">{{{ registerPageContent }}}</main>`
     }
 }
 

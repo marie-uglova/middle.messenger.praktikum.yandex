@@ -8,7 +8,7 @@ export function connect(Component: any, selector?: Function) {
             store.subscribe(() => {
                 if(selector) {
                     let props = selector(store.getState());
-                    this.setProps(props);
+                    this.setProps({props: props});
                 }
 
             });
