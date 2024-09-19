@@ -123,14 +123,7 @@ export class ChatPageContainer extends Block {
                 chatAdd: chatAdd,
                 chatItem: chatItem,
                 chatTopbar: chatTopbar,
-                chatList: [
-                    new ChatMessageComponent({
-                        message: 'С Байконура совершил старт корабль «Восток». Кстати, такое название присуще многим советским кораблям для полета в космос.',
-                    }),
-                    new ChatMessageComponent({
-                        message: 'С Байконура совершил старт корабль «Восток». Кстати, такое название присуще многим советским кораблям для полета в космос.',
-                    }),
-                ],
+                messageList: [],
                 chatForm: chatForm,
             }),
         })
@@ -183,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatList = document.querySelector('.chat__list');
             const chatListItem = document.querySelector('.ts-chat-list-item').content.querySelector('.chat__list-item');
 
-            function createListItem(item) {
+            function createChatItem(item) {
                 const listItem = chatListItem.cloneNode(true); // клонируем
                 listItem.setAttribute('data-id', item.id);
                 listItem.querySelector('.chat__list-name').textContent = item.id;
@@ -200,12 +193,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(fragment);
             }
 
-            renderList(chats, createListItem, chatList);
+            renderList(chats, createChatItem, chatList);
 
             const chatListItems = document.querySelectorAll('.chat__list-item');
             chatListItems.forEach((el) => {
                 el.addEventListener('click', (item) => {
                     openChat(item.target.dataset.id);
+                })
+            })
+
+            const chatAddButtons = document.querySelectorAll('.chat__add-btn');
+            chatAddButtons.forEach((el) => {
+                el.addEventListener('click', (item) => {
+                    console.log('Цой жив')
                 })
             })
 
@@ -215,6 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
 let socket;
 
 function openChat(id) {
+    const chatContainer = document.querySelector('.chat__container');
+    chatContainer.classList.remove('hidden');
     const chatId = id;
     user.getUserId().then((userId) => {
         const dataUsers = {
@@ -244,11 +246,6 @@ function openChat(id) {
                             socket = new WebSocket(`wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`);
                             socket.addEventListener('open', () => {
                                 console.log('Соединение установлено');
-
-                                socket.send(JSON.stringify({
-                                    content: 'Моё первое сообщение миру!',
-                                    type: 'message',
-                                }));
                             });
 
                             socket.addEventListener('close', event => {
@@ -262,7 +259,17 @@ function openChat(id) {
                             });
 
                             socket.addEventListener('message', event => {
-                                console.log('Получены данные', event.data);
+                                const data = JSON.parse(event.data);
+                                const input = document.getElementById('message');
+                                const messages = document.querySelector('.chat__feed');
+                                const div = document.createElement('div');
+                                div.classList.add('chat__message');
+                                /*if(data.user_id === me.id) {
+                                    div.classList.add('message_me');
+                                }*/
+                                div.textContent = data.content;
+                                messages.append(div);
+                                input.value = '';
                             });
 
                             socket.addEventListener('error', event => {
