@@ -7,8 +7,16 @@
     border-right: solid 1px $c-border;
   }
   &__header {
-    padding: 20px;
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+  &__add-btn.button {
+    font-size: 28px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
   }
   &__list {
     flex: 1;
@@ -20,11 +28,14 @@
       border-top: solid 1px $c-border;
       padding: 20px;
       font-size: 12px;
+      & * {
+        pointer-events: none;
+      }
     }
     &-avatar {
       flex-shrink: 0;
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       overflow: hidden;
       img {

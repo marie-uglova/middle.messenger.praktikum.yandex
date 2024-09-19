@@ -13,6 +13,7 @@ export { ChatItem } from './chat/chat-item';
 export { ChatMessage } from './chat/chat-message';
 export { ChatTopbar } from './chat/chat-topbar';
 export { ChatForm } from './chat/chat-form';
+export { ChatAdd } from './chat/chat-add';
 
 export { ProfileHeader } from './profile/profile-header';
 export { ProfileAvatarForm } from './profile/profile-avatar-form';
