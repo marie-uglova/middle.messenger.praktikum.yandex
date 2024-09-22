@@ -12,6 +12,8 @@ export { RegisterWindow } from './login/register-window';
 export { ChatItem } from './chat/chat-item';
 export { ChatMessage } from './chat/chat-message';
 export { ChatTopbar } from './chat/chat-topbar';
+export { ChatSearchForm } from './chat/chat-search-form';
+export { ChatSearchResult } from './chat/chat-search-result';
 export { ChatForm } from './chat/chat-form';
 export { ChatAdd } from './chat/chat-add';
 
