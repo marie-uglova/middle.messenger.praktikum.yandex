@@ -13,6 +13,7 @@ import {ChatAdd} from '../components/chat/chat-add/';
 import {ChatPage} from '../pages/chat-page';
 import User from './get-user';
 import HTTPTransport from './http';
+import {log} from "handlebars";
 
 const http = new HTTPTransport(),
     user = new User();
@@ -168,7 +169,48 @@ export class ChatPageContainer extends Block {
                 chatForm: chatForm,
             }),
         })
+    }
 
+    override componentDidUpdate(oldProps: any, newProps: any): boolean {
+        if(oldProps.props?.first_name !== newProps.props?.first_name) {
+            http.get('https://ya-praktikum.tech/api/v2/chats', {
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+            })
+                .then((response) => {
+                    const chats = JSON.parse(response.response);
+                    console.log(chats)
+                    const chatList = document.querySelector('.chat__list');
+                    const chatListItem = document.querySelector('.ts-chat-list-item').content.querySelector('.chat__list-item');
+
+                    function createChatItem(item) {
+                        const listItem = chatListItem.cloneNode(true);
+                        listItem.setAttribute('data-id', item.id);
+                        listItem.querySelector('.chat__list-name').textContent = item.id;
+                        listItem.querySelector('.chat__list-intro').textContent = item.title;
+                        listItem.querySelector('.chat__list-count').textContent = item.unread_count;
+                        return listItem;
+                    }
+
+                    renderList(chats, createChatItem, chatList);
+
+                    const chatListItems = document.querySelectorAll('.chat__list-item');
+                    chatListItems.forEach((el) => {
+                        el.addEventListener('click', (item) => {
+                            openChat(item.target.dataset.id);
+                        })
+                    })
+
+                })
+            return true;
+        }
+        return false;
+    }
+
+    componentDidMount(props) {
+        //super.componentDidMount(props);
+        this.componentDidUpdate;
     }
 
     override render() {
@@ -249,39 +291,6 @@ function searchUser(evt: Event) {
             })
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    http.get('https://ya-praktikum.tech/api/v2/chats', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-    })
-        .then((response) => {
-            const chats = JSON.parse(response.response);
-            console.log(chats)
-            const chatList = document.querySelector('.chat__list');
-            const chatListItem = document.querySelector('.ts-chat-list-item').content.querySelector('.chat__list-item');
-
-            function createChatItem(item) {
-                const listItem = chatListItem.cloneNode(true);
-                listItem.setAttribute('data-id', item.id);
-                listItem.querySelector('.chat__list-name').textContent = item.id;
-                listItem.querySelector('.chat__list-intro').textContent = item.title;
-                listItem.querySelector('.chat__list-count').textContent = item.unread_count;
-                return listItem;
-            }
-
-            renderList(chats, createChatItem, chatList);
-
-            const chatListItems = document.querySelectorAll('.chat__list-item');
-            chatListItems.forEach((el) => {
-                el.addEventListener('click', (item) => {
-                    openChat(item.target.dataset.id);
-                })
-            })
-
-        })
-})
 
 let socket;
 
