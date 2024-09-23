@@ -1,7 +1,7 @@
 import './assets/scss/app.scss';
-import Router from './modules/router';
-import User from './modules/get-user';
-import { connect } from './modules/hoc';
+import Router from './core/router';
+import User from './core/get-user';
+import { connect } from './core/hoc';
 import { LoginPageContainer } from './modules/login';
 import { RegisterPageContainer } from './modules/register';
 import { ChatPageContainer } from './modules/chat';

@@ -1,4 +1,4 @@
-import Block from './block';
+import Block from '../core/block';
 import { validationResults, validate, validateForm, checkLogin, checkName, checkEmail, checkPhone } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
@@ -7,9 +7,9 @@ import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
 import { ProfileAvatarForm } from '../components/profile/profile-avatar-form';
 import { ProfileEditPage } from '../pages/profile-edit-page';
-import Router from './router';
-import User from './get-user';
-import HTTPTransport from './http';
+import Router from '../core/router';
+import User from '../core/get-user';
+import HTTPTransport from '../core/http';
 
 const router = new Router('app'),
     http = new HTTPTransport(),

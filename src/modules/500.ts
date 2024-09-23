@@ -1,4 +1,4 @@
-import Block from './block';
+import Block from '../core/block';
 import { Error500Page } from '../pages/error500-page';
 
 class Error500PageComponent extends Block {

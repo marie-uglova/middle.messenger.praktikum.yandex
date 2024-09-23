@@ -1,11 +1,11 @@
-import Block from './block';
+import Block from '../core/block';
 import { Link } from '../components/uikit/link';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileRow } from '../components/profile/profile-row';
 import { ProfilePage } from '../pages/profile-page';
-import Router from './router';
-import HTTPTransport from './http';
-import User from './get-user';
+import Router from '../core/router';
+import HTTPTransport from '../core/http';
+import User from '../core/get-user';
 
 const router = new Router('app'),
     http = new HTTPTransport(),

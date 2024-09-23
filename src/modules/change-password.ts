@@ -1,4 +1,4 @@
-import Block from './block';
+import Block from '../core/block';
 import { validationResults, validate, validateForm, checkPassword } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
@@ -6,8 +6,8 @@ import { Button } from '../components/uikit/button';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
 import { ChangePasswordPage } from '../pages/change-password-page';
-import User from './get-user';
-import HTTPTransport from './http';
+import User from '../core/get-user';
+import HTTPTransport from '../core/http';
 
 const http = new HTTPTransport(),
     user = new User();

@@ -1,23 +1,23 @@
-const createStore = (reducer, initialState) => {
-    const subscribers = [];
+const createStore = (reducer: (state: {}, action: {type: string, payload: string}) => {}, initialState: {}) => {
+    const subscribers: Function[] = [];
     let currentState = initialState;
 
     return {
         getState: () => currentState,
-        subscribe: fn => {
+        subscribe: (fn: Function) => {
             subscribers.push(fn);
             fn(currentState);
         },
-        dispatch: action => {
+        dispatch: (action: {type: string, payload: string}) => {
             currentState = reducer(currentState, action);
             subscribers.forEach(fn => fn(currentState));
         }
     };
 };
 
-const deepCopy = object => JSON.parse(JSON.stringify(object));
+const deepCopy = (object: {}) => JSON.parse(JSON.stringify(object));
 
-const reducer = (state, action) => {
+const reducer = (state: {}, action: {type: string, payload: string}) => {
     let newState = deepCopy(state);
     if(action.type === 'ADD_USER') {
         newState.user = action.payload;
@@ -28,17 +28,7 @@ const reducer = (state, action) => {
 };
 
 
-let state = {};
-
-/*let setTextAction = {
-    type: 'SET_TEXT',
-    buttonText: ''
-};
-
-let setUserProps = {
-    type: 'SET_USER',
-    buttonText: ''
-};*/
+let state: {} = {};
 
 let store = Object.freeze(createStore(reducer, state));
 

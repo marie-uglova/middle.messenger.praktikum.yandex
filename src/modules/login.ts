@@ -1,4 +1,4 @@
-import Block from './block';
+import Block from '../core/block';
 import { validationResults, validate, validateForm, checkLogin, checkPassword } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
@@ -7,8 +7,8 @@ import { Link } from '../components/uikit/link';
 import { LoginForm } from '../components/login/login-form';
 import { LoginWindow } from '../components/login/login-window';
 import { LoginPage } from '../pages/login-page';
-import Router from './router';
-import HTTPTransport from './http';
+import Router from '../core/router';
+import HTTPTransport from '../core/http';
 
 const router = new Router('app'),
     http = new HTTPTransport();

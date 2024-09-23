@@ -51,18 +51,18 @@ export default class Block<Props extends Record<string, any> = any> {
         this.eventBus().emit(Block.EVENTS.FLOW_RENDER);
     }
 
-    _componentDidMount() {
-        this.componentDidMount();
+    _componentDidMount(oldProps: string | number | null) {
+        this.componentDidMount(oldProps);
         Object.values(this.children).forEach(child => {child.dispatchComponentDidMount();});
     }
 
-    componentDidMount(oldProps) {}
+    componentDidMount(_oldProps: string | number | null) {}
 
     dispatchComponentDidMount() {
         this.eventBus().emit(Block.EVENTS.FLOW_CDM);
     }
 
-    _componentDidUpdate(oldProps: string | number | null, newProps: string | number | null) {
+    private _componentDidUpdate(oldProps: string | number | null, newProps: string | number | null) {
         const response = this.componentDidUpdate(oldProps, newProps);
         if (!response) {
             return;
@@ -70,7 +70,7 @@ export default class Block<Props extends Record<string, any> = any> {
         this._render();
     }
 
-    componentDidUpdate(oldProps, newProps) {
+    componentDidUpdate(_oldProps: string | number | null, _newProps: string | number | null) {
         return true;
     }
 
@@ -189,11 +189,13 @@ export default class Block<Props extends Record<string, any> = any> {
         return document.createElement(tagName);
     }
 
-    show() {
-        this.getContent()!.style.display = "flex";
+    public show(): void {
+        const content: any = this.getContent();
+        if (content) content.style.display = 'flex';
     }
 
-    hide() {
-        this.getContent()!.style.display = "none";
+    public hide(): void {
+        const content: any = this.getContent();
+        if (content) content.style.display = 'none';
     }
 }
