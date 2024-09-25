@@ -1,4 +1,24 @@
-<template class="ts-chat-list-item">
+<div class="chat__list-item">
+    <div class="chat__list-avatar">
+        <img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />
+    </div>
+    <div class="chat__list-preview">
+        <div class="chat__list-name">
+            {{{ name }}}
+        </div>
+        <div class="chat__list-intro">
+            {{{ intro }}}
+        </div>
+    </div>
+    <div class="chat__list-cell">
+        {{!-- <div class="chat__time">10:49</div> --}}
+        <div class="chat__list-count">
+            {{{ count }}}
+        </div>
+    </div>
+</div>
+
+{{!-- <template class="ts-chat-list-item">
     <div class="chat__list-item">
         <div class="chat__list-avatar">
             <img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />
@@ -8,9 +28,7 @@
             <div class="chat__list-intro"></div>
         </div>
         <div class="chat__list-cell">
-            {{!-- <div class="chat__time">10:49</div> --}}
             <div class="chat__list-count"></div>
         </div>
     </div>
-</template>
-
+</template> --}}

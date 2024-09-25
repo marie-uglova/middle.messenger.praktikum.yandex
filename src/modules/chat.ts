@@ -3,10 +3,13 @@ import {checkMessage, validate, validateForm, validationResults} from './validat
 import {Input} from '../components/uikit/input';
 import {Field} from '../components/uikit/field';
 import {Button} from '../components/uikit/button';
+import {ChatList} from '../components/chat/chat-list';
 import {ChatItem} from '../components/chat/chat-item';
 import {ChatMessage} from '../components/chat/chat-message';
+import {ChatMessageList} from '../components/chat/chat-message-list';
 import {ChatTopbar} from '../components/chat/chat-topbar';
 import {ChatSearchForm} from '../components/chat/chat-search-form/';
+import {ChatSearchResultItem} from '../components/chat/chat-search-result-item/';
 import {ChatSearchResult} from '../components/chat/chat-search-result/';
 import {ChatForm} from '../components/chat/chat-form/';
 import {ChatAdd} from '../components/chat/chat-add/';
@@ -41,6 +44,12 @@ class ChatAddComponent extends Block {
     }
 }
 
+class ChatListComponent extends Block {
+    render() {
+        return ChatList;
+    }
+}
+
 class ChatItemComponent extends Block {
     render() {
         return ChatItem;
@@ -53,6 +62,12 @@ class ChatMessageComponent extends Block {
     }
 }
 
+class ChatMessageListComponent extends Block {
+    render() {
+        return ChatMessageList;
+    }
+}
+
 class ChatTopbarComponent extends Block {
     render() {
         return ChatTopbar;
@@ -62,6 +77,12 @@ class ChatTopbarComponent extends Block {
 class ChatSearchFormComponent extends Block {
     render() {
         return ChatSearchForm;
+    }
+}
+
+class ChatSearchResultItemComponent extends Block {
+    render() {
+        return ChatSearchResultItem;
     }
 }
 
@@ -84,11 +105,22 @@ class ChatPageComponent extends Block {
 }
 
 const chatItem = new ChatItemComponent({
-    /*events: {
+    name: '',
+    intro: '',
+    count: '',
+    events: {
         click: (evt: Event) => {
             openChat(evt);
         }
-    }*/
+    }
+});
+
+const chatList = new ChatListComponent({
+    chats: ''
+});
+
+const messageList = new ChatMessageListComponent({
+    messages: ''
 });
 
 const chatAdd = new ChatAddComponent({
@@ -125,7 +157,7 @@ const chatSearchForm = new ChatSearchFormComponent({
 });
 
 const chatSearchResult = new ChatSearchResultComponent({
-
+    result: ''
 });
 
 const chatForm = new ChatFormComponent({
@@ -162,9 +194,9 @@ export class ChatPageContainer extends Block {
                 chatAdd: chatAdd,
                 chatSearchForm: chatSearchForm,
                 chatSearchResult: chatSearchResult,
-                chatItem: chatItem,
+                chatList: chatList,
                 chatTopbar: chatTopbar,
-                messageList: [],
+                messageList: messageList,
                 chatForm: chatForm,
             }),
         })
@@ -178,28 +210,27 @@ export class ChatPageContainer extends Block {
                 },
             })
                 .then((response) => {
-                    const chats = JSON.parse(response.response);
-                    console.log(chats)
-                    const chatList = document.querySelector('.chat__list');
-                    const chatListItem = document.querySelector('.ts-chat-list-item').content.querySelector('.chat__list-item');
-
-                    function createChatItem(item) {
-                        const listItem = chatListItem.cloneNode(true);
-                        listItem.setAttribute('data-id', item.id);
-                        listItem.querySelector('.chat__list-name').textContent = item.id;
-                        listItem.querySelector('.chat__list-intro').textContent = item.title;
-                        listItem.querySelector('.chat__list-count').textContent = item.unread_count;
-                        return listItem;
+                    const dataChats = JSON.parse(response.response);
+                    console.log(dataChats);
+                    if(Array.isArray(dataChats) && dataChats.length) {
+                        chatList.lists = {
+                            chats: dataChats.map(
+                                (data) => new ChatItemComponent({
+                                    name: data.last_message?.user.first_name,
+                                    intro: data.last_message?.content,
+                                    count: data.unread_count
+                                })
+                            )
+                        }
+                        chatList.setProps({a: 1});
                     }
-
-                    renderList(chats, createChatItem, chatList);
-
+                    /*
                     const chatListItems = document.querySelectorAll('.chat__list-item');
                     chatListItems.forEach((el) => {
                         el.addEventListener('click', (item) => {
                             openChat(item.target.dataset.id);
                         })
-                    })
+                    })*/
 
                 })
             return true;
@@ -248,14 +279,6 @@ function addChat(evt: Event) {
         })
 }
 
-function renderList(array, template, container) {
-    const fragment = document.createDocumentFragment();
-    for (const key of array) {
-        fragment.appendChild(template(key));
-    }
-    container.appendChild(fragment);
-}
-
 function searchUser(evt: Event) {
     evt.preventDefault();
     let input = (evt.target as HTMLInputElement).querySelector('input');
@@ -270,19 +293,19 @@ function searchUser(evt: Event) {
             data: JSON.stringify(data),
         })
             .then(data => {
-                const result = JSON.parse(data.response);
-                console.log(result);
-                const searchResult = document.querySelector('.chat__result');
-                const searchListItem = document.querySelector('.ts-chat-result-item').content.querySelector('.chat__result-item');
-                function createResultItem(item) {
-                    const listItem = searchListItem.cloneNode(true);
-                    listItem.querySelector('.chat__result-name').textContent = item.login;
-                    listItem.querySelector('.chat__result-btn').setAttribute('data-id', item.id);
-                    return listItem;
+                const dataResult = JSON.parse(data.response);
+                console.log(dataResult);
+                if(Array.isArray(dataResult) && dataResult.length) {
+                    chatSearchResult.lists = {
+                        result: dataResult.map(
+                            (data) => new ChatSearchResultItemComponent({
+                                name: data.login,
+                            })
+                        )
+                    }
+                    chatSearchResult.setProps({a: 1});
                 }
-                renderList(result, createResultItem, searchResult);
-                const usersToAdd = document.querySelectorAll('.chat__result-btn');
-                usersToAdd.forEach((el) => {
+                /*usersToAdd.forEach((el) => {
                     el.addEventListener('click', (item) => {
                         console.log('Добавить в чат пользователя', item.target.dataset.id);
                         const dataUsers = {
@@ -299,7 +322,7 @@ function searchUser(evt: Event) {
                                 console.log(response.status);
                             })
                     })
-                })
+                })*/
             })
     }
 }
@@ -342,17 +365,20 @@ function openChat(id) {
                 });
 
                 socket.addEventListener('message', event => {
-                    const data = JSON.parse(event.data);
-                    const input = document.getElementById('message');
-                    const messages = document.querySelector('.chat__feed');
-                    const div = document.createElement('div');
-                    div.classList.add('chat__message');
-                    /*if(data.user_id === me.id) {
-                        div.classList.add('message_me');
-                    }*/
-                    div.textContent = data.content;
-                    messages.append(div);
-                    input.value = '';
+                    const dataList = JSON.parse(event.data);
+                    if(Array.isArray(dataList) && dataList.length) {
+                        messageList.lists = {
+                            messages: dataList.map(
+                                ({time, content, user_id}) => new ChatMessageComponent({
+                                    message: content,
+                                    time: time,
+                                    className: userId === user_id ? '_outgoing' : null  })
+                            )
+                        }
+                        messageList.setProps({a: 1});
+                    } else if (typeof dataList === 'object' && dataList?.type === 'message') {
+                        console.log(dataList);
+                    }
                 });
 
                 socket.addEventListener('error', event => {
@@ -372,5 +398,6 @@ function sendMessage(evt: Event) {
             content: input.value,
             type: 'message',
         }));
+        input.value = '';
     }
 }
