@@ -66,6 +66,10 @@ class ChatMessageListComponent extends Block {
     render() {
         return ChatMessageList;
     }
+
+    /*push(chatMessageComponent: ChatMessageComponent) {
+        console.log(chatMessageComponent)
+    }*/
 }
 
 class ChatTopbarComponent extends Block {
@@ -218,20 +222,17 @@ export class ChatPageContainer extends Block {
                                 (data) => new ChatItemComponent({
                                     name: data.last_message?.user.first_name,
                                     intro: data.last_message?.content,
-                                    count: data.unread_count
+                                    count: data.unread_count,
+                                    events: {
+                                        click: () => {
+                                            openChat(data.id);
+                                        }
+                                    }
                                 })
                             )
                         }
                         chatList.setProps({a: 1});
                     }
-                    /*
-                    const chatListItems = document.querySelectorAll('.chat__list-item');
-                    chatListItems.forEach((el) => {
-                        el.addEventListener('click', (item) => {
-                            openChat(item.target.dataset.id);
-                        })
-                    })*/
-
                 })
             return true;
         }
@@ -300,29 +301,29 @@ function searchUser(evt: Event) {
                         result: dataResult.map(
                             (data) => new ChatSearchResultItemComponent({
                                 name: data.login,
+                                events: {
+                                    click: () => {
+                                        console.log('Добавить в чат пользователя', data.id);
+                                        const dataUsers = {
+                                            users: [data.id],
+                                            chatId: 27005,
+                                        }
+                                        http.put(`https://ya-praktikum.tech/api/v2/chats/users`, {
+                                            headers: {
+                                                'Content-Type': 'application/json; charset=UTF-8',
+                                            },
+                                            data: JSON.stringify(dataUsers),
+                                        })
+                                            .then(response => {
+                                                console.log(response.status);
+                                            })
+                                    }
+                                }
                             })
                         )
                     }
                     chatSearchResult.setProps({a: 1});
                 }
-                /*usersToAdd.forEach((el) => {
-                    el.addEventListener('click', (item) => {
-                        console.log('Добавить в чат пользователя', item.target.dataset.id);
-                        const dataUsers = {
-                            users: [item.target.dataset.id],
-                            chatId: 27005,
-                        }
-                        http.put(`https://ya-praktikum.tech/api/v2/chats/users`, {
-                            headers: {
-                                'Content-Type': 'application/json; charset=UTF-8',
-                            },
-                            data: JSON.stringify(dataUsers),
-                        })
-                            .then(response => {
-                                console.log(response.status);
-                            })
-                    })
-                })*/
             })
     }
 }
@@ -372,12 +373,18 @@ function openChat(id) {
                                 ({time, content, user_id}) => new ChatMessageComponent({
                                     message: content,
                                     time: time,
-                                    className: userId === user_id ? '_outgoing' : null  })
+                                    className: userId === user_id ? '_outgoing' : null}),
                             )
                         }
                         messageList.setProps({a: 1});
                     } else if (typeof dataList === 'object' && dataList?.type === 'message') {
                         console.log(dataList);
+                        messageList.push(new ChatMessageComponent({
+                            message: dataList.content,
+                            time: dataList.time,
+                            className: userId === dataList.user_id ? '_outgoing' : null})
+                        );
+                        messageList.setProps({a: 1});
                     }
                 });
 
