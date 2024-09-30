@@ -21,6 +21,8 @@ export class AuthController {
             const { status, response } = await authApi.singin(data);
             if (status === 200) {
                 router.go('/messenger');
+            } else if (status === 400) {
+                router.go('/messenger');
             } else if (status === 500) {
                 router.go('/500');
             } else {
@@ -34,6 +36,8 @@ export class AuthController {
         try {
             const { status, response } = await authApi.singup(data);
             if (status === 200) {
+                router.go('/messenger');
+            } else if (status === 400) {
                 router.go('/messenger');
             } else if (status === 500) {
                 router.go('/500');
