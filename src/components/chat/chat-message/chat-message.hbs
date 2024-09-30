@@ -1,8 +1,9 @@
-<div class="chat__message">
+<div class="chat__message {{#if className}} {{{ className }}}{{/if}}">
     <p>
         {{{ message }}}
     </p>
     <div class="chat__time">
         {{{ time }}}
     </div>
+    {{{ deleteButton }}}
 </div>

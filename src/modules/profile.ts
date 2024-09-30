@@ -3,13 +3,10 @@ import { Link } from '../components/uikit/link';
 import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileRow } from '../components/profile/profile-row';
 import { ProfilePage } from '../pages/profile-page';
-import Router from '../core/router';
-import HTTPTransport from '../core/http';
 import User from '../core/get-user';
+import AuthController from '../controllers/auth-controller';
 
-const router = new Router('app'),
-    http = new HTTPTransport(),
-    user = new User();
+const user = new User();
 
 class LinkComponent extends Block {
     render() {
@@ -97,7 +94,16 @@ export class ProfilePageContainer extends Block {
 
     override componentDidUpdate(oldProps: any, newProps: any): boolean {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
-            profileHeader.setProps({userFirstName: newProps.props.first_name, userAvatar: newProps.props.avatar});
+            profileHeader.setProps({
+                userFirstName: newProps.props.first_name,
+                userAvatar: (() => {
+                    if (newProps.props.avatar) {
+                        return `<img loading="lazy" src="https://ya-praktikum.tech/api/v2/resources${newProps.props.avatar}" alt="аватар юзера" />`;
+                    } else {
+                        return `<img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />`;
+                    }
+                })()
+            });
             profileRowName.setProps({field: newProps.props.first_name});
             profileRowSecondName.setProps({field: newProps.props.second_name});
             profileRowLogin.setProps({field: newProps.props.login});
@@ -116,12 +122,5 @@ export class ProfilePageContainer extends Block {
 
 function logOut(evt: Event) {
     evt.preventDefault();
-    http.post('https://ya-praktikum.tech/api/v2/auth/logout', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-    })
-        .then(() => {
-            router.go('/');
-        });
+    AuthController.logout();
 }

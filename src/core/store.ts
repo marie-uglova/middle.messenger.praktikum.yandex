@@ -8,7 +8,7 @@ const createStore = (reducer: (state: {}, action: {type: string, payload: string
             subscribers.push(fn);
             fn(currentState);
         },
-        dispatch: (action: {type: string, payload: string}) => {
+        dispatch: (action: {type: string, payload: any}) => {
             currentState = reducer(currentState, action);
             subscribers.forEach(fn => fn(currentState));
         }

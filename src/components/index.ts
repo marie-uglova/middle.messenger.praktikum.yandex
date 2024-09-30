@@ -10,6 +10,7 @@ export { RegisterForm } from './login/register-form';
 export { RegisterWindow } from './login/register-window';
 
 export { ChatList } from './chat/chat-list';
+export { ChatDeleteUserButton } from './chat/chat-delete-user-button';
 export { ChatItem } from './chat/chat-item';
 export { ChatMessage } from './chat/chat-message';
 export { ChatMessageList } from './chat/chat-message-list';

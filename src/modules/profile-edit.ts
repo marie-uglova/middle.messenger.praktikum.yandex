@@ -7,13 +7,10 @@ import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
 import { ProfileAvatarForm } from '../components/profile/profile-avatar-form';
 import { ProfileEditPage } from '../pages/profile-edit-page';
-import Router from '../core/router';
 import User from '../core/get-user';
-import HTTPTransport from '../core/http';
+import ProfileController from '../controllers/profile-controller';
 
-const router = new Router('app'),
-    http = new HTTPTransport(),
-    user = new User();
+const user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -184,7 +181,7 @@ const profileAvatarForm = new ProfileAvatarFormComponent({
     profileAvatar: fieldAvatar,
     events: {
         submit: (evt: Event) => {
-            setAvatar(evt);
+            changeAvatar(evt);
         }
     }
 })
@@ -215,7 +212,16 @@ export class ProfileEditPageContainer extends Block {
 
     override componentDidUpdate(oldProps: any, newProps: any): boolean {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
-            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            profileHeader.setProps({
+                userFirstName: newProps.props.first_name,
+                userAvatar: (() => {
+                    if (newProps.props.avatar) {
+                        return `<img loading="lazy" src="https://ya-praktikum.tech/api/v2/resources${newProps.props.avatar}" alt="аватар юзера" />`;
+                    } else {
+                        return `<img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />`;
+                    }
+                })()
+            });
             inputName.setProps({value: newProps.props.first_name});
             inputSecondName.setProps({value: newProps.props.second_name});
             inputDisplayName.setProps({value: newProps.props.display_name});
@@ -255,7 +261,7 @@ function checkForm(evt: Event) {
 }
 
 function changeProfile(evt: Event) {
-    const form = (evt.target as HTMLTextAreaElement),
+    const form = (evt.target as HTMLFormElement),
         firstName = form.querySelector(`[name="first_name"]`),
         firstNameValue = (firstName as HTMLInputElement).value,
         secondName = form.querySelector(`[name="second_name"]`),
@@ -278,43 +284,18 @@ function changeProfile(evt: Event) {
         phone: phoneValue,
     };
 
-    http.put('https://ya-praktikum.tech/api/v2/user/profile', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        data: JSON.stringify(data),
-    })
-        .then((response) => {
-            if(response.status === 200) {
-                router.go('/profile');
-            } else {
-                alert(JSON.parse(response.response).reason);
-            }
-        });
+    ProfileController.changeProfile(JSON.stringify(data));
 }
 
-function setAvatar(evt: Event) {
+function changeAvatar(evt: Event) {
     evt.preventDefault();
 
-    const form = (evt.target as HTMLTextAreaElement),
+    const form = (evt.target as HTMLFormElement),
         formData = new FormData(form),
         avatar = form.querySelector(`[name="avatar"]`),
         avatarValue = (avatar as HTMLInputElement).value;
 
-    formData.append('avatar', avatar);
+    formData.append('avatar', avatarValue);
 
-    http.put('https://ya-praktikum.tech/api/v2/user/profile/avatar', {
-        headers: {
-            'credentials': 'include',
-            'mode': 'cors',
-        },
-        data: formData,
-    })
-        .then((response) => {
-            if(response.status === 200) {
-                console.log(response);
-            } else {
-                alert(JSON.parse(response.response).reason);
-            }
-        });
+    ProfileController.changeAvatar(formData);
 }

@@ -20,6 +20,8 @@ const timeout = 0;
 
 type HTTPMethod = (url: string, options?: {}) => Promise<unknown>
 
+export type HTTPData = Record<string, string | number | Array<string | number>>;
+
 export default class HTTPTransport {
     get: HTTPMethod = (url, options = {}) => (
         this.request(url, {...options, method: METHODS.GET}, timeout)

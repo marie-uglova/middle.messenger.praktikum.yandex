@@ -7,10 +7,9 @@ import { ProfileHeader } from '../components/profile/profile-header';
 import { ProfileForm } from '../components/profile/profile-form';
 import { ChangePasswordPage } from '../pages/change-password-page';
 import User from '../core/get-user';
-import HTTPTransport from '../core/http';
+import ProfileController from '../controllers/profile-controller';
 
-const http = new HTTPTransport(),
-    user = new User();
+const user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -127,7 +126,16 @@ export class ChangePasswordPageContainer extends Block {
 
     override componentDidUpdate(oldProps: any, newProps: any): boolean {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
-            profileHeader.setProps({userFirstName: newProps.props.first_name});
+            profileHeader.setProps({
+                userFirstName: newProps.props.first_name,
+                userAvatar: (() => {
+                    if (newProps.props.avatar) {
+                        return `<img loading="lazy" src="https://ya-praktikum.tech/api/v2/resources${newProps.props.avatar}" alt="аватар юзера" />`;
+                    } else {
+                        return `<img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />`;
+                    }
+                })()
+            });
             return true;
         }
         return false;
@@ -157,7 +165,7 @@ function checkForm(evt: Event) {
 }
 
 function changePassword(evt: Event) {
-    const form = (evt.target as HTMLTextAreaElement),
+    const form = (evt.target as HTMLFormElement),
         oldPassword = form.querySelector(`[name="password_old"]`),
         oldPasswordValue = (oldPassword as HTMLInputElement).value,
         newPassword = form.querySelector(`[name="password"]`),
@@ -168,17 +176,5 @@ function changePassword(evt: Event) {
         newPassword: newPasswordValue,
     };
 
-    http.put('https://ya-praktikum.tech/api/v2/user/password', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        data: JSON.stringify(data),
-    })
-        .then((response) => {
-            if(response.status === 200) {
-                alert('Пароль изменен');
-            } else {
-                alert(JSON.parse(response.response).reason);
-            }
-        });
+    ProfileController.changePassword(JSON.stringify(data));
 }

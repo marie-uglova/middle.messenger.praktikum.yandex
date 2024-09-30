@@ -7,11 +7,7 @@ import { Link } from '../components/uikit/link';
 import { RegisterForm } from '../components/login/register-form';
 import { RegisterWindow } from '../components/login/register-window';
 import { RegisterPage } from '../pages/register-page';
-import Router from '../core/router';
-import HTTPTransport from '../core/http';
-
-const router = new Router('app'),
-    http = new HTTPTransport();
+import AuthController from '../controllers/auth-controller';
 
 class InputComponent extends Block {
     render() {
@@ -218,38 +214,35 @@ function checkForm(evt: Event) {
         validationResults.phone &&
         validationResults.first_name &&
         validationResults.second_name) {
-        singUp();
+        singUp(evt);
     } else {
         validateForm(evt, registerValidationResults);
     }
 }
 
-function singUp() {
-    const first_name = document.querySelector(`[name="first_name"]`).value,
-        second_name = document.querySelector(`[name="second_name"]`).value,
-        login = document.querySelector(`[name="login"]`).value,
-        email = document.querySelector(`[name="email"]`).value,
-        password = document.querySelector(`[name="password"]`).value,
-        phone = document.querySelector(`[name="phone"]`).value;
+function singUp(evt: Event) {
+    const form = (evt.target as HTMLFormElement),
+        firstName = document.querySelector(`[name="first_name"]`),
+        firstNameValue = (firstName as HTMLInputElement).value,
+        secondName = document.querySelector(`[name="second_name"]`),
+        secondNameValue = (secondName as HTMLInputElement).value,
+        login = form.querySelector(`[name="login"]`),
+        loginValue = (login as HTMLInputElement).value,
+        email = form.querySelector(`[name="email"]`),
+        emailValue = (email as HTMLInputElement).value,
+        password = form.querySelector(`[name="password"]`),
+        passwordValue = (password as HTMLInputElement).value,
+        phone = form.querySelector(`[name="phone"]`),
+        phoneValue = (phone as HTMLInputElement).value;
 
     const data = {
-        first_name: first_name,
-        second_name: second_name,
-        login: login,
-        email: email,
-        password: password,
-        phone: phone,
+        first_name: firstNameValue,
+        second_name: secondNameValue,
+        login: loginValue,
+        email: emailValue,
+        password: passwordValue,
+        phone: phoneValue,
     };
 
-    http.post('https://ya-praktikum.tech/api/v2/auth/signup', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        data: JSON.stringify(data),
-    })
-        .then((response) => {
-            // сделать, чтобы редиректил только в случае успеха
-            router.go('/profile');
-            //user.getUser();
-        });
+    AuthController.signup(JSON.stringify(data));
 }

@@ -4,10 +4,10 @@ import {Input} from '../components/uikit/input';
 import {Field} from '../components/uikit/field';
 import {Button} from '../components/uikit/button';
 import {ChatList} from '../components/chat/chat-list';
+import {ChatDeleteUserButton} from '../components/chat/chat-delete-user-button';
 import {ChatItem} from '../components/chat/chat-item';
 import {ChatMessage} from '../components/chat/chat-message';
 import {ChatMessageList} from '../components/chat/chat-message-list';
-import {ChatTopbar} from '../components/chat/chat-topbar';
 import {ChatSearchForm} from '../components/chat/chat-search-form/';
 import {ChatSearchResultItem} from '../components/chat/chat-search-result-item/';
 import {ChatSearchResult} from '../components/chat/chat-search-result/';
@@ -15,10 +15,9 @@ import {ChatForm} from '../components/chat/chat-form/';
 import {ChatAdd} from '../components/chat/chat-add/';
 import {ChatPage} from '../pages/chat-page';
 import User from '../core/get-user';
-import HTTPTransport from '../core/http';
+import ChatController from '../controllers/chat-controller';
 
-const http = new HTTPTransport(),
-    user = new User();
+const user = new User();
 
 class InputComponent extends Block {
     render() {
@@ -50,6 +49,12 @@ class ChatListComponent extends Block {
     }
 }
 
+class ChatDeleteUserButtonComponent extends Block {
+    render() {
+        return ChatDeleteUserButton;
+    }
+}
+
 class ChatItemComponent extends Block {
     render() {
         return ChatItem;
@@ -65,16 +70,6 @@ class ChatMessageComponent extends Block {
 class ChatMessageListComponent extends Block {
     render() {
         return ChatMessageList;
-    }
-
-    /*push(chatMessageComponent: ChatMessageComponent) {
-        console.log(chatMessageComponent)
-    }*/
-}
-
-class ChatTopbarComponent extends Block {
-    render() {
-        return ChatTopbar;
     }
 }
 
@@ -108,35 +103,20 @@ class ChatPageComponent extends Block {
     }
 }
 
-const chatItem = new ChatItemComponent({
-    name: '',
-    intro: '',
-    count: '',
-    events: {
-        click: (evt: Event) => {
-            openChat(evt);
-        }
-    }
-});
-
 const chatList = new ChatListComponent({
-    chats: ''
+    chats: []
 });
 
 const messageList = new ChatMessageListComponent({
-    messages: ''
+    messages: []
 });
 
 const chatAdd = new ChatAddComponent({
     events: {
-        click: (evt: Event) => {
-            addChat(evt);
+        click: () => {
+            showSearch();
         }
     }
-});
-
-const chatTopbar = new ChatTopbarComponent({
-    name: 'Константин'
 });
 
 const chatSearchForm = new ChatSearchFormComponent({
@@ -161,7 +141,7 @@ const chatSearchForm = new ChatSearchFormComponent({
 });
 
 const chatSearchResult = new ChatSearchResultComponent({
-    result: ''
+    result: []
 });
 
 const chatForm = new ChatFormComponent({
@@ -199,30 +179,36 @@ export class ChatPageContainer extends Block {
                 chatSearchForm: chatSearchForm,
                 chatSearchResult: chatSearchResult,
                 chatList: chatList,
-                chatTopbar: chatTopbar,
                 messageList: messageList,
                 chatForm: chatForm,
             }),
         })
+        user.getUserStore();
     }
 
     override componentDidUpdate(oldProps: any, newProps: any): boolean {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
-            http.get('https://ya-praktikum.tech/api/v2/chats', {
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
-            })
+            ChatController.getChats()
                 .then((response) => {
-                    const dataChats = JSON.parse(response.response);
-                    console.log(dataChats);
-                    if(Array.isArray(dataChats) && dataChats.length) {
+                    if(Array.isArray(response) && response.length) {
+                        const dataChatsWithMessages = response.filter(el => el.last_message);
                         chatList.lists = {
-                            chats: dataChats.map(
+                            chats: dataChatsWithMessages.map(
                                 (data) => new ChatItemComponent({
-                                    name: data.last_message?.user.first_name,
-                                    intro: data.last_message?.content,
-                                    count: data.unread_count,
+                                    name: data.last_message.user.first_name,
+                                    intro: data.last_message.content,
+                                    avatar: (() => {
+                                        if (data.last_message.user.avatar !== null) {
+                                            return `<img loading="lazy" src="https://ya-praktikum.tech/api/v2/resources${data.last_message.user.avatar}" alt="аватар юзера" />`;
+                                        } else {
+                                            return `<img loading="lazy" src="../assets/images/ava.png" alt="аватар юзера" />`;
+                                        }
+                                    })(),
+                                    count: (() => {
+                                        if (data.unread_count > 0) {
+                                            return '<div class="chat__list-count">' + data.unread_count + '</div>';
+                                        }
+                                    })(),
                                     events: {
                                         click: () => {
                                             openChat(data.id);
@@ -237,11 +223,6 @@ export class ChatPageContainer extends Block {
             return true;
         }
         return false;
-    }
-
-    componentDidMount(props) {
-        //super.componentDidMount(props);
-        this.componentDidUpdate;
     }
 
     override render() {
@@ -263,96 +244,72 @@ function checkForm(evt: Event) {
     }
 }
 
-function addChat(evt: Event) {
-    const data = {
-        title: 'новый чат',
-    };
-    // создаем чат
-    http.post('https://ya-praktikum.tech/api/v2/chats', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        data: JSON.stringify(data),
-    })
-        .then((response) => {
-            const addUserForm = document.querySelector('.chat__list-form');
-            addUserForm.classList.remove('hidden');
-        })
+function showSearch() {
+    const addUserForm = document.querySelector('.chat__list-form');
+    if(addUserForm) addUserForm.classList.toggle('hidden');
 }
 
 function searchUser(evt: Event) {
     evt.preventDefault();
     let input = (evt.target as HTMLInputElement).querySelector('input');
     if(input != null) {
-        const data = {
+        const dataSearchValue = {
             login: input.value,
         };
-        http.post('https://ya-praktikum.tech/api/v2/user/search', {
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-            },
-            data: JSON.stringify(data),
-        })
-            .then(data => {
-                const dataResult = JSON.parse(data.response);
-                console.log(dataResult);
-                if(Array.isArray(dataResult) && dataResult.length) {
-                    chatSearchResult.lists = {
-                        result: dataResult.map(
-                            (data) => new ChatSearchResultItemComponent({
-                                name: data.login,
-                                events: {
-                                    click: () => {
-                                        console.log('Добавить в чат пользователя', data.id);
-                                        const dataUsers = {
-                                            users: [data.id],
-                                            chatId: 27005,
+        ChatController.searchUser(JSON.stringify(dataSearchValue))
+            .then(dataSearch => {
+                if(Array.isArray(dataSearch) && dataSearch.length) {
+                    const dataCreate = {
+                        title: 'новый чат',
+                    };
+                    ChatController.createChat(JSON.stringify(dataCreate))
+                        .then((response: any) => {
+                            const chatId = response.id;
+                            chatSearchResult.lists = {
+                                result: dataSearch.map(
+                                    (data) => new ChatSearchResultItemComponent({
+                                        name: data.login,
+                                        events: {
+                                            click: () => {
+                                                console.log('Добавить в чат', chatId, 'пользователя', data.id);
+                                                const dataUsers = {
+                                                    users: [data.id],
+                                                    chatId: chatId,
+                                                }
+                                                ChatController.addUser(JSON.stringify(dataUsers))
+                                                    .then(() => {
+                                                        openChat(chatId);
+                                                    })
+                                            }
                                         }
-                                        http.put(`https://ya-praktikum.tech/api/v2/chats/users`, {
-                                            headers: {
-                                                'Content-Type': 'application/json; charset=UTF-8',
-                                            },
-                                            data: JSON.stringify(dataUsers),
-                                        })
-                                            .then(response => {
-                                                console.log(response.status);
-                                            })
-                                    }
-                                }
-                            })
-                        )
-                    }
-                    chatSearchResult.setProps({a: 1});
+                                    })
+                                )
+                            }
+                            chatSearchResult.setProps({a: 1});
+                        })
                 }
             })
     }
 }
 
-let socket;
+let socket: WebSocket;
 
-function openChat(id) {
+function openChat(id: number) {
     const chatContainer = document.querySelector('.chat__container');
-    chatContainer.classList.remove('hidden');
+    if(chatContainer) chatContainer.classList.remove('hidden');
     const chatId = id;
     user.getUserId().then((userId) => {
         // получаем токен
-        http.post(`https://ya-praktikum.tech/api/v2/chats/token/${chatId}`, {
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-                'credentials': 'include',
-                'mode': 'cors',
-            },
-        })
-            .then(data => {
-                const token = JSON.parse(data.response).token;
+        ChatController.getToken(chatId)
+            .then((dataToken: any) => {
+                const token = dataToken.token;
                 socket = new WebSocket(`wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`);
-                socket.addEventListener('open', (event) => {
+                socket.addEventListener('open', () => {
                     console.log('Соединение установлено');
                     socket.send(JSON.stringify({
                         content: 0,
                         type: 'get old',
                     }))
-                    //this._offset += 20;
                 });
 
                 socket.addEventListener('close', event => {
@@ -367,19 +324,27 @@ function openChat(id) {
 
                 socket.addEventListener('message', event => {
                     const dataList = JSON.parse(event.data);
+
                     if(Array.isArray(dataList) && dataList.length) {
                         messageList.lists = {
                             messages: dataList.map(
                                 ({time, content, user_id}) => new ChatMessageComponent({
                                     message: content,
                                     time: time,
-                                    className: userId === user_id ? '_outgoing' : null}),
+                                    className: userId === user_id ? '_outgoing' : null,
+                                    deleteButton: userId !== user_id ? new ChatDeleteUserButtonComponent({
+                                        events: {
+                                            click: () => {
+                                                deleteUser(user_id, chatId);
+                                            }
+                                        }
+                                    }) : null,
+                                }),
                             )
                         }
                         messageList.setProps({a: 1});
                     } else if (typeof dataList === 'object' && dataList?.type === 'message') {
-                        console.log(dataList);
-                        messageList.push(new ChatMessageComponent({
+                        messageList.lists.messages.push(new ChatMessageComponent({
                             message: dataList.content,
                             time: dataList.time,
                             className: userId === dataList.user_id ? '_outgoing' : null})
@@ -388,15 +353,13 @@ function openChat(id) {
                     }
                 });
 
-                socket.addEventListener('error', event => {
-                    console.log('Ошибка', event.message);
+                socket.addEventListener('error', () => {
+                    console.log('Ошибка');
                 });
 
             });
     })
 }
-
-
 
 function sendMessage(evt: Event) {
     let input = (evt.target as HTMLInputElement).querySelector('input');
@@ -407,4 +370,16 @@ function sendMessage(evt: Event) {
         }));
         input.value = '';
     }
+}
+
+function deleteUser(userId: number, chatId: number) {
+    console.log('Удалить юзера', userId, 'из чата', chatId);
+    const dataDeleteUser = {
+        users: [userId],
+        chatId: chatId
+    };
+    ChatController.deleteUser(JSON.stringify(dataDeleteUser))
+        .then(() => {
+            alert('Юзер удален из чата');
+        })
 }

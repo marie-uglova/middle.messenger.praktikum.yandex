@@ -7,11 +7,7 @@ import { Link } from '../components/uikit/link';
 import { LoginForm } from '../components/login/login-form';
 import { LoginWindow } from '../components/login/login-window';
 import { LoginPage } from '../pages/login-page';
-import Router from '../core/router';
-import HTTPTransport from '../core/http';
-
-const router = new Router('app'),
-    http = new HTTPTransport();
+import AuthController from '../controllers/auth-controller';
 
 class InputComponent extends Block {
     render() {
@@ -142,7 +138,7 @@ function checkForm(evt: Event) {
 }
 
 function singIn(evt: Event) {
-    const form = (evt.target as HTMLTextAreaElement),
+    const form = (evt.target as HTMLFormElement),
         login = form.querySelector(`[name="login"]`),
         loginValue = (login as HTMLInputElement).value,
         password = form.querySelector(`[name="password"]`),
@@ -153,14 +149,5 @@ function singIn(evt: Event) {
         password: passwordValue,
     };
 
-    http.post('https://ya-praktikum.tech/api/v2/auth/signin', {
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        data: JSON.stringify(data),
-    })
-        .then(() => {
-            // сделать, чтобы редиректил только в случае успеха
-            router.go('/messenger');
-        });
+    AuthController.signin(JSON.stringify(data));
 }
