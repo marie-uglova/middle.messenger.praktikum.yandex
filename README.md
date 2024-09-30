@@ -1,6 +1,6 @@
-Проектная работа Угловой Марии, Спринт 2
+Проектная работа Угловой Марии, Спринт 3
 
-https://yandex-messenger2.netlify.app/
+https://yandex-messanger3.netlify.app/
 
 Команды:
 
