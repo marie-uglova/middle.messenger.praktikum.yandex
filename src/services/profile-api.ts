@@ -13,7 +13,7 @@ class ProfileApi extends BaseAPI {
         });
     }
 
-    public changeAvatar(data: any): Promise<any> {
+    public changeAvatar(data: FormData): Promise<any> {
         return this.http.put(`${this.baseUrl}/user/profile/avatar`, {
             data,
             headers: {

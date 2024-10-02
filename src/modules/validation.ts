@@ -25,6 +25,12 @@ export function validate(evt: Event, checkFunctionName: { (value: string): boole
     }
 }
 
+export function setField(name: string, functionName: (value: string) => boolean) {
+    const input = document.querySelector(`[name="${name}"]`),
+        value = (input as HTMLInputElement).value;
+    validationResults[name] = functionName(value);
+}
+
 export function validateForm(evt: Event, object: Record<string, boolean | null>) {
     const failedResults = Object.fromEntries(
             Object.entries(object).filter(([__, value]) => !value)),
@@ -68,6 +74,8 @@ export function checkPassword(value: string) {
     return basicExpression.test(value);
 }
 
+const isEmpty = (value: string): boolean => value.trim().length === 0;
+
 export function checkMessage(value: string) {
-    return value !== '';
+    return !isEmpty(value);
 }

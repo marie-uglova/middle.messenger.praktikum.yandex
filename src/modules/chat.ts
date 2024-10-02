@@ -190,12 +190,14 @@ export class ChatPageContainer extends Block {
         if(oldProps.props?.first_name !== newProps.props?.first_name) {
             ChatController.getChats()
                 .then((response) => {
+                    console.log(response)
                     if(Array.isArray(response) && response.length) {
                         const dataChatsWithMessages = response.filter(el => el.last_message);
                         chatList.lists = {
                             chats: dataChatsWithMessages.map(
                                 (data) => new ChatItemComponent({
                                     name: data.last_message.user.first_name,
+                                    title: data.title,
                                     intro: data.last_message.content,
                                     avatar: (() => {
                                         if (data.last_message.user.avatar !== null) {
@@ -323,33 +325,36 @@ function openChat(id: number) {
                 });
 
                 socket.addEventListener('message', event => {
-                    const dataList = JSON.parse(event.data);
-
-                    if(Array.isArray(dataList) && dataList.length) {
-                        messageList.lists = {
-                            messages: dataList.map(
-                                ({time, content, user_id}) => new ChatMessageComponent({
-                                    message: content,
-                                    time: time,
-                                    className: userId === user_id ? '_outgoing' : null,
-                                    deleteButton: userId !== user_id ? new ChatDeleteUserButtonComponent({
-                                        events: {
-                                            click: () => {
-                                                deleteUser(user_id, chatId);
+                    try {
+                        const dataList = JSON.parse(event.data);
+                        if(Array.isArray(dataList) && dataList.length) {
+                            messageList.lists = {
+                                messages: dataList.map(
+                                    ({time, content, user_id}) => new ChatMessageComponent({
+                                        message: content,
+                                        time: time,
+                                        className: userId === user_id ? '_outgoing' : null,
+                                        deleteButton: userId !== user_id ? new ChatDeleteUserButtonComponent({
+                                            events: {
+                                                click: () => {
+                                                    deleteUser(user_id, chatId);
+                                                }
                                             }
-                                        }
-                                    }) : null,
-                                }),
-                            )
+                                        }) : null,
+                                    }),
+                                )
+                            }
+                            messageList.setProps({a: 1});
+                        } else if (typeof dataList === 'object' && dataList?.type === 'message') {
+                            messageList.lists.messages.push(new ChatMessageComponent({
+                                message: dataList.content,
+                                time: dataList.time,
+                                className: userId === dataList.user_id ? '_outgoing' : null})
+                            );
+                            messageList.setProps({a: 1});
                         }
-                        messageList.setProps({a: 1});
-                    } else if (typeof dataList === 'object' && dataList?.type === 'message') {
-                        messageList.lists.messages.push(new ChatMessageComponent({
-                            message: dataList.content,
-                            time: dataList.time,
-                            className: userId === dataList.user_id ? '_outgoing' : null})
-                        );
-                        messageList.setProps({a: 1});
+                    } catch (err) {
+                        alert( err.message );
                     }
                 });
 

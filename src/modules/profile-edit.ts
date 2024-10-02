@@ -1,5 +1,5 @@
 import Block from '../core/block';
-import { validationResults, validate, validateForm, checkLogin, checkName, checkEmail, checkPhone } from './validation';
+import { validationResults, validate, setField, validateForm, checkLogin, checkName, checkEmail, checkPhone } from './validation';
 import { Input } from '../components/uikit/input';
 import { Field } from '../components/uikit/field';
 import { Button } from '../components/uikit/button';
@@ -240,6 +240,12 @@ export class ProfileEditPageContainer extends Block {
 
 function checkForm(evt: Event) {
     evt.preventDefault();
+
+    setField('first_name', checkName);
+    setField('second_name', checkName);
+    setField('login', checkLogin);
+    setField('email', checkEmail);
+    setField('phone', checkPhone);
 
     const profileValidationResults: Record<string, boolean | null> = {
         'email': validationResults.email,
