@@ -13,6 +13,6 @@ router
 describe('Router', () => {
     it('Обновить историю', () => {
         router.go('/404');
-        expect(window.history.length).to.be.eq(2);
+        expect(window.history.length).to.eq(2);
     })
 })
