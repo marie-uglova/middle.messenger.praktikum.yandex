@@ -7,7 +7,7 @@
       "components": ["src/components"]
     },
     "outDir": "dist",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
