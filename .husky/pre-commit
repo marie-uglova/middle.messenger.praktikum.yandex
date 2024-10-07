@@ -2,4 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npm.cmd run eslint
-npm.cmd run test
+npm run test
