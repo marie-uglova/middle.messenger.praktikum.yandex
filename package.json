@@ -47,10 +47,5 @@
     "url": "^0.11.3",
     "uuid": "^10.0.0",
     "vite-plugin-checker": "^0.6.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm-run-test"
-    }
   }
 }
