@@ -7,7 +7,7 @@
       "components": ["src/components"]
     },
     "outDir": "dist",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
@@ -17,7 +17,7 @@
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node",
-    "transpileOnly": true,
+    "transpileOnly": true
   },
   "exclude": ["node_modules"]
 }
