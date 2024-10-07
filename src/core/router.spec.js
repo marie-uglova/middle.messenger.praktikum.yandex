@@ -7,7 +7,7 @@ const error404Page = connect(Error404PageContainer)
 
 const router = new Router('<body></body>');
 router
-    .use("/404", error404Page)
+    .use('/404', error404Page)
     .start()
 
 describe('Router', () => {
