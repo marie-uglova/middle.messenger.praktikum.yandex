@@ -1,6 +1,6 @@
 Проектная работа Угловой Марии, Спринт 4
 
-https://yandex-messanger3.netlify.app/
+https://yandex-messager4.netlify.app/
 
 Команды:
 
