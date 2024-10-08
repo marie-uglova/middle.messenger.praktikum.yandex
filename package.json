@@ -16,7 +16,7 @@
     "eslint-fix": "eslint --fix",
     "test": "mocha",
     "prepare": "husky install",
-    "pre-commit": "lint-staged",
+    "lint-staged": "lint-staged",
     "postinstall": "husky install"
   },
   "lint-staged": {

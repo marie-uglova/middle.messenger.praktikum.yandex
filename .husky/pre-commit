@@ -3,5 +3,5 @@
 
 npm run stylelint
 #npm run eslint
-npm run pre-commit
+npm run lint-staged
 npm run test
