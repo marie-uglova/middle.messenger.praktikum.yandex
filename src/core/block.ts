@@ -1,5 +1,6 @@
 import EventBus from "./event-bus";
-import * as Handlebars from 'handlebars';
+//import * as Handlebars from 'handlebars';
+import Handlebars from 'handlebars';
 
 export default class Block<Props extends Record<string, any> = any> {
     static EVENTS = {

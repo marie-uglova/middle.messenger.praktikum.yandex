@@ -1,6 +1,6 @@
-Проектная работа Угловой Марии, Спринт 3
+Проектная работа Угловой Марии, Спринт 4
 
-https://yandex-messanger3.netlify.app/
+https://yandex-messager4.netlify.app/
 
 Команды:
 
@@ -15,3 +15,5 @@ npm run preview - тестовый просмотр
 npm run lint - проверка typescript
 
 npm run eslint - eslint
+
+npm run test - тесты
