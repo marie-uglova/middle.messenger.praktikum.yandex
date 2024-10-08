@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "color-hex-length": "long",
+    "at-rule-no-unknown": null,
+    "declaration-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "no-descending-specificity": null
+  }
+}
