@@ -13,7 +13,7 @@ describe('HTTP', () => {
             },
         })
             .then((response) => {
-                expect(response).to.be.eq({'reason': 'Cookie is not valid'});
+                expect(response).to.be.eq({'reason': 'Cookiess is not valid'});
             })
     })
 })
